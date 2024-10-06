@@ -1,10 +1,16 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import App from './App.tsx'
-import './index.css'
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { PrimeReactProvider } from "primereact/api";
+import App from "./App";
+import "./index.css";
+import "primereact/resources/themes/lara-light-purple/theme.css";
+import "primeicons/primeicons.css";
+import "./App.css";
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
+  <React.StrictMode>
+    <PrimeReactProvider value={{ unstyled: false }}>
+      <App />
+    </PrimeReactProvider>
+  </React.StrictMode>
+);
