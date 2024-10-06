@@ -1,20 +1,49 @@
-import { useState } from "react";
-import { Button } from "primereact/button";
-import { InputText } from "primereact/inputtext";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom"; // Use BrowserRouter here
+
+import { useContext, useEffect, useState } from "react";
+import { PrimeReactContext } from "primereact/api";
+import { LoginPage } from "./modules/loginPage/login.page";
+import { Menubar } from "./components/menubar/menubar";
+import { Header } from "./components/header/header";
+import { ProductOverview } from "./modules/productOverviewPage/productOverview.page";
 
 function App() {
-  const [count, setCount] = useState(0);
+  const [menubarVisible, setMenubarVisible] = useState<boolean>(false);
+  const ctx = useContext(PrimeReactContext);
+  const isLoggedIn = true;
+
+  useEffect(() => {
+    if (ctx) {
+      // Add your context-related logic here
+    }
+  }, [ctx]);
+
+  const handleMenuClick = () => {
+    if (menubarVisible) setMenubarVisible(false);
+    else setMenubarVisible(true);
+  };
 
   return (
-    <>
-      <h1 className="text-center">
-        Hello world!
-      </h1>
-      <div className="card">
-        <Button icon="pi pi-plus" className="mr-2" label="Increment" onClick={() => setCount((count) => count + 1)}></Button>
-        <InputText value={count.toString()} />
+    <Router>
+      <div>
+        {isLoggedIn ? (
+          <div>
+            <Menubar
+              isVisible={menubarVisible}
+              onMenubarClick={handleMenuClick}
+            ></Menubar>
+            <Header onMenuClick={handleMenuClick} />
+            <Routes>
+              <Route index element={<ProductOverview />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="*" element={<ProductOverview />} />
+            </Routes>
+          </div>
+        ) : (
+          <LoginPage />
+        )}
       </div>
-    </>
+    </Router>
   );
 }
 
