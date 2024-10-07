@@ -6,11 +6,16 @@ import { LoginPage } from "./modules/loginPage/login.page";
 import { Menubar } from "./components/menubar/menubar";
 import { Header } from "./components/header/header";
 import { ProductOverview } from "./modules/productOverviewPage/productOverview.page";
+import { useAppSelector } from "./hooks/hooks";
 
 function App() {
+  const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
   const [menubarVisible, setMenubarVisible] = useState<boolean>(false);
   const ctx = useContext(PrimeReactContext);
-  const isLoggedIn = true;
+
+  useEffect(() => {
+    setMenubarVisible(false);
+  }, [isLoggedIn]);
 
   useEffect(() => {
     if (ctx) {
@@ -35,7 +40,6 @@ function App() {
             <Header onMenuClick={handleMenuClick} />
             <Routes>
               <Route index element={<ProductOverview />} />
-              <Route path="/login" element={<LoginPage />} />
               <Route path="*" element={<ProductOverview />} />
             </Routes>
           </div>

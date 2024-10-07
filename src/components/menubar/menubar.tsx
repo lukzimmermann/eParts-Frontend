@@ -1,5 +1,8 @@
 import { Button } from "primereact/button";
 import { Sidebar } from "primereact/sidebar";
+import { useNavigate } from "react-router-dom";
+import { useAppDispatch } from "../../hooks/hooks";
+import { logOut } from "../../store/authSlice";
 
 type Props = {
   isVisible: boolean;
@@ -7,6 +10,14 @@ type Props = {
 };
 
 export function Menubar({ isVisible, onMenubarClick }: Props) {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  const handleLogoutClick = () => {
+    dispatch(logOut());
+    navigate("/");
+  };
+
   return (
     <Sidebar
       header={<h2 className="text-2xl ml-5">Menu</h2>}
@@ -23,6 +34,7 @@ export function Menubar({ isVisible, onMenubarClick }: Props) {
           icon="pi pi-sign-out"
           className="justify-center gap-2 mx-5 justify-self-end"
           severity="secondary"
+          onClick={handleLogoutClick}
         >
           Logout
         </Button>

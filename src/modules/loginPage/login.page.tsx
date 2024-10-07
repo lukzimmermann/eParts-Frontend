@@ -1,16 +1,19 @@
-import { Button } from "primereact/button";
+import { useState } from "react";
 import { Card } from "primereact/card";
+import { Button } from "primereact/button";
+import { logIn } from "../../store/authSlice";
+import { useNavigate } from "react-router-dom";
 import { IconField } from "primereact/iconfield";
 import { InputIcon } from "primereact/inputicon";
 import { InputText } from "primereact/inputtext";
 import { apiCall, Method } from "../utils/apiCall";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useAppDispatch } from "../../hooks/hooks";
 
 export function LoginPage() {
-  const navigate = useNavigate();
   const [username, setUsername] = useState<string>(undefined);
   const [password, setPassword] = useState<string>(undefined);
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   const handleLoginClick = async () => {
     const payload = {
@@ -21,6 +24,7 @@ export function LoginPage() {
     const response = await apiCall<any>(Method.POST, "auth/login", payload);
 
     if (response.data.message === "Login successful") {
+      dispatch(logIn());
       navigate("/");
     }
   };
@@ -31,12 +35,12 @@ export function LoginPage() {
         <div className="flex flex-col">
           <label className="mb-1 ml-1">E-Mail</label>
           <IconField className="mb-3" iconPosition="left">
-            <InputIcon className="pi pi-envelope"> </InputIcon>
+            <InputIcon className="pi pi-envelope ml-0.5"> </InputIcon>
             <InputText onChange={(e) => setUsername(e.target.value)} />
           </IconField>
           <label className="mb-1 ml-1">Password</label>
           <IconField className="mb-2" iconPosition="left">
-            <InputIcon className="pi pi-shield"> </InputIcon>
+            <InputIcon className="pi pi-shield ml-0.5"> </InputIcon>
             <InputText
               type="password"
               onChange={(e) => setPassword(e.target.value)}

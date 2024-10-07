@@ -18,6 +18,7 @@ export function Header({ onMenuClick }: Props) {
         text
         className="m-2 justify-self-start"
         size="large"
+        style={{ color: "var(--text-color)" }}
         onClick={onMenuClick}
       />
       <div className="self-center">
