@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom"; // Use BrowserRouter here
-
 import { useContext, useEffect, useState } from "react";
 import { PrimeReactContext } from "primereact/api";
 import { LoginPage } from "./modules/loginPage/login.page";
@@ -10,18 +9,23 @@ import { useAppSelector } from "./hooks/hooks";
 
 function App() {
   const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
+  const isDarkMode = useAppSelector((state) => state.theme.isDarkMode);
   const [menubarVisible, setMenubarVisible] = useState<boolean>(false);
-  const ctx = useContext(PrimeReactContext);
+  const { changeTheme } = useContext(PrimeReactContext);
 
   useEffect(() => {
     setMenubarVisible(false);
   }, [isLoggedIn]);
 
   useEffect(() => {
-    if (ctx) {
-      // Add your context-related logic here
+    if (isDarkMode) {
+      changeTheme(
+        "/themes/lara-light/theme.css",
+        "/themes/lara-dark/theme.css",
+        "theme-link"
+      );
     }
-  }, [ctx]);
+  }, []);
 
   const handleMenuClick = () => {
     if (menubarVisible) setMenubarVisible(false);
