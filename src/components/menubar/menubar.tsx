@@ -1,13 +1,13 @@
+import { useContext } from "react";
 import { Button } from "primereact/button";
 import { Sidebar } from "primereact/sidebar";
 import { useNavigate } from "react-router-dom";
+import { logOut } from "../../store/authSlice";
 import { useAppDispatch } from "../../hooks/hooks";
 import { useAppSelector } from "../../hooks/hooks";
-import { logOut } from "../../store/authSlice";
-import { InputSwitch } from "primereact/inputswitch";
-import { toggleDarkMode } from "../../store/theme";
-import { useContext } from "react";
 import { PrimeReactContext } from "primereact/api";
+import { toggleDarkMode } from "../../store/theme";
+import { InputSwitch } from "primereact/inputswitch";
 
 type Props = {
   isVisible: boolean;
@@ -15,10 +15,10 @@ type Props = {
 };
 
 export function Menubar({ isVisible, onMenubarClick }: Props) {
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const { changeTheme } = useContext(PrimeReactContext);
   const isDarkMode = useAppSelector((state) => state.theme.isDarkMode);
-  const dispatch = useAppDispatch();
-  const navigate = useNavigate();
 
   const handleThemeChange = () => {
     dispatch(toggleDarkMode({ changeTheme }));

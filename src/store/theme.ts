@@ -56,7 +56,7 @@ const themeSlice = createSlice({
                   );
             }
             
-          },
+        },
       },
 })
 

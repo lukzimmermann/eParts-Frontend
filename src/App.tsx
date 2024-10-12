@@ -1,20 +1,20 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom"; // Use BrowserRouter here
-import { useContext, useEffect, useState } from "react";
-import { PrimeReactContext } from "primereact/api";
-import { LoginPage } from "./modules/loginPage/login.page";
-import { Menubar } from "./components/menubar/menubar";
-import { Header } from "./components/header/header";
-import { ProductOverview } from "./modules/productOverviewPage/productOverview.page";
-import { useAppSelector } from "./hooks/hooks";
 import { useDispatch } from "react-redux";
+import { useAppSelector } from "./hooks/hooks";
+import { PrimeReactContext } from "primereact/api";
+import { Header } from "./components/header/header";
+import { Menubar } from "./components/menubar/menubar";
+import { useContext, useEffect, useState } from "react";
 import { darkModeOn, darkModeOff } from "./store/theme";
+import { LoginPage } from "./modules/loginPage/login.page";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom"; // Use BrowserRouter here
+import { ProductOverview } from "./modules/productOverviewPage/productOverview.page";
 
 function App() {
+  const dispatch = useDispatch();
+  const { changeTheme } = useContext(PrimeReactContext);
   const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
   const isDarkMode = useAppSelector((state) => state.theme.isDarkMode);
   const [menubarVisible, setMenubarVisible] = useState<boolean>(false);
-  const dispatch = useDispatch();
-  const { changeTheme } = useContext(PrimeReactContext);
 
   useEffect(() => {
     if (isDarkMode) {
