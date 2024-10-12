@@ -6,26 +6,27 @@ import { Menubar } from "./components/menubar/menubar";
 import { Header } from "./components/header/header";
 import { ProductOverview } from "./modules/productOverviewPage/productOverview.page";
 import { useAppSelector } from "./hooks/hooks";
+import { useDispatch } from "react-redux";
+import { darkModeOn, darkModeOff } from "./store/theme";
 
 function App() {
   const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
   const isDarkMode = useAppSelector((state) => state.theme.isDarkMode);
   const [menubarVisible, setMenubarVisible] = useState<boolean>(false);
+  const dispatch = useDispatch();
   const { changeTheme } = useContext(PrimeReactContext);
+
+  useEffect(() => {
+    if (isDarkMode) {
+      dispatch(darkModeOn({ changeTheme }));
+    } else {
+      dispatch(darkModeOff({ changeTheme }));
+    }
+  }, []);
 
   useEffect(() => {
     setMenubarVisible(false);
   }, [isLoggedIn]);
-
-  useEffect(() => {
-    if (isDarkMode) {
-      changeTheme(
-        "/themes/lara-light/theme.css",
-        "/themes/lara-dark/theme.css",
-        "theme-link"
-      );
-    }
-  }, []);
 
   const handleMenuClick = () => {
     if (menubarVisible) setMenubarVisible(false);

@@ -5,7 +5,7 @@ import { useAppDispatch } from "../../hooks/hooks";
 import { useAppSelector } from "../../hooks/hooks";
 import { logOut } from "../../store/authSlice";
 import { InputSwitch } from "primereact/inputswitch";
-import { darkModeOff, darkModeOn } from "../../store/theme";
+import { toggleDarkMode } from "../../store/theme";
 import { useContext } from "react";
 import { PrimeReactContext } from "primereact/api";
 
@@ -21,21 +21,7 @@ export function Menubar({ isVisible, onMenubarClick }: Props) {
   const navigate = useNavigate();
 
   const handleThemeChange = () => {
-    if (isDarkMode) {
-      dispatch(darkModeOff());
-      changeTheme(
-        "/themes/lara-dark/theme.css",
-        "/themes/lara-light/theme.css",
-        "theme-link"
-      );
-    } else {
-      dispatch(darkModeOn());
-      changeTheme(
-        "/themes/lara-light/theme.css",
-        "/themes/lara-dark/theme.css",
-        "theme-link"
-      );
-    }
+    dispatch(toggleDarkMode({ changeTheme }));
   };
 
   const handleLogoutClick = () => {
