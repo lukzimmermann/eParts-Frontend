@@ -9,10 +9,7 @@ type Props = {
 
 export function Header({ onMenuClick }: Props) {
   return (
-    <div
-      className="h-20 flex align-middle justify-between"
-      style={{ background: "var(--surface-overlay)" }}
-    >
+    <div className="h-20 flex align-middle justify-between bg-[linear-gradient(90deg,var(--header-color-gradient-1),var(--header-color-gradient-2),var(--header-color-gradient-1))]">
       <Button
         icon="pi pi-bars"
         text

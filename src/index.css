@@ -10,10 +10,30 @@
   @tailwind utilities;
 }
 
-:root{
+
+:root {
   font-size: 1rem;
 }
 
 body {
   margin: 0;
+}
+
+.p-sidebar-header {
+  align-items: start;
+}
+
+@layer DataTable{
+  .p-datatable-tbody tr {
+    background: transparent;
+  }
+  
+  .p-datatable-scrollable .p-datatable-table > .p-datatable-thead th {
+    background: var(--background-color-gradient-2);
+  }
+  
+  .p-paginator {
+    background: transparent;
+    border-color: transparent;
+  }
 }

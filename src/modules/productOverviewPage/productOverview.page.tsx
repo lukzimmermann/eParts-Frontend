@@ -31,8 +31,8 @@ export const ProductOverview = () => {
 
   return (
     <div
-      className="m-10 p-4 rounded-xl"
-      style={{ background: "var(--surface-overlay)" }}
+      className="m-10 p-4 rounded-2xl
+                 bg-[linear-gradient(180deg,var(--background-color-gradient-2)_10%,var(--background-color-gradient-2)_10%,var(--background-color-gradient-1)_100%)]"
     >
       <ProductDetail
         productId={selectedProductId}
@@ -40,6 +40,7 @@ export const ProductOverview = () => {
         visible={detailVisible}
       />
       <DataTable
+        tableClassName=""
         value={products}
         tableStyle={{ minWidth: "100rem" }}
         paginator

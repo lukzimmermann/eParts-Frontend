@@ -16,6 +16,10 @@
   --primary-color-hover: #840ef25d;
   --primary-color-press: #630bb5;
   --primary-color-text: #030712;
+  --background-color-gradient-1: #1b1c1f;
+  --background-color-gradient-2: #1F2023;
+  --header-color-gradient-1: #1D1C22;
+  --header-color-gradient-2: #27262C;
   --surface-0: #111827;
   --surface-50: #1f2937;
   --surface-100: #374151;
@@ -51,6 +55,12 @@
   --highlight-bg: rgba(167, 139, 250, 0.16);
   --highlight-text-color: rgba(255, 255, 255, 0.87);
   color-scheme: dark;
+  background-color: #161519;
+}
+
+.p-datatable-tbody tr:hover {
+  background: rgb(46, 46, 46);
+  cursor: pointer;
 }
 
 @font-face {
@@ -5017,7 +5027,7 @@
     border-top-color: #424b57;
   }
   .p-sidebar {
-    background: #1f2937;
+    background: #161519;
     color: rgba(255, 255, 255, 0.87);
     border: 1px solid #424b57;
     box-shadow: 0px 11px 15px -7px rgba(0, 0, 0, 0.2), 0px 24px 38px 3px rgba(0, 0, 0, 0.14), 0px 9px 46px 8px rgba(0, 0, 0, 0.12);

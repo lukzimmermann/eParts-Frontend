@@ -9,6 +9,8 @@ import { PrimeReactContext } from "primereact/api";
 import { toggleDarkMode } from "../../store/theme";
 import { InputSwitch } from "primereact/inputswitch";
 import MenuItem from "./menuItem";
+import { Avatar } from "primereact/avatar";
+import { Menu } from "primereact/menu";
 
 interface MenuItem {
   id: number;
@@ -24,7 +26,7 @@ const menuItems: MenuItem[] = [
   },
   {
     id: 1,
-    icon: "pi-mapv",
+    icon: "pi-map",
     title: "Projects",
   },
   {
@@ -69,15 +71,31 @@ export function Menubar({ isVisible, onMenubarClick }: Props) {
 
   const handleMenuItemClick = (id: number) => {
     setCurrentMenuItem(menuItems.filter((e) => e.id === id)[0]);
+    onMenubarClick();
   };
 
   return (
     <Sidebar
-      header={<h2 className="text-2xl ml-5">Menu</h2>}
+      header={
+        <div className="flex w-full justify-center">
+          <div className="flex flex-col items-center">
+            <Avatar
+              className="justify-self-center"
+              image="/themes/avatar.png"
+              size="xlarge"
+              shape="circle"
+            />
+            <label className="mt-3">Lukas Zimmermann</label>
+            <label className="text-[var(--text-color-secondary)] text-sm">
+              Software Engineer
+            </label>
+          </div>
+        </div>
+      }
       visible={isVisible}
       onHide={onMenubarClick}
     >
-      <div className="flex flex-col h-full justify-between">
+      <div className="flex flex-col h-full justify-between mt-5">
         <div className="flex flex-col align-middle">
           {menuItems.map((e) => (
             <MenuItem
@@ -90,16 +108,14 @@ export function Menubar({ isVisible, onMenubarClick }: Props) {
             />
           ))}
         </div>
-        <div className="flex flex-col">
-          <Button
-            icon="pi pi-sign-out"
-            className="justify-center gap-2 mx-5 justify-self-end"
-            severity="secondary"
+        <div className="flex flex-col mb-8">
+          <MenuItem
+            id={99}
+            title="Logout"
+            icon="pi-sign-out"
             onClick={handleLogoutClick}
-          >
-            Logout
-          </Button>
-          <div className="flex gap-6 justify-center items-center mb-4 mt-8">
+          />
+          <div className="flex gap-3 items-center ml-5 mt-4">
             <i
               className={isDarkMode ? "pi pi-moon" : "pi pi-sun"}
               style={{ fontSize: "1rem" }}
