@@ -81,7 +81,7 @@ export function Menubar({ isVisible, onMenubarClick }: Props) {
           <div className="flex flex-col items-center">
             <Avatar
               className="justify-self-center"
-              image="/themes/avatar.png"
+              image="./avatar.png"
               size="xlarge"
               shape="circle"
             />

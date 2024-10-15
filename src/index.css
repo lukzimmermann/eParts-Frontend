@@ -23,6 +23,17 @@ body {
   align-items: start;
 }
 
+.input-clear {
+  background: transparent;
+  border: none;
+  font-size: 2rem;
+}
+
+.input-clear:focus {
+  border: none;
+  outline: none;
+}
+
 @layer DataTable{
   .p-datatable-tbody tr {
     background: transparent;

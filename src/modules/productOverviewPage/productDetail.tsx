@@ -5,6 +5,7 @@ import { Product } from "../../interfaces/product";
 import { InputNumber } from "primereact/inputnumber";
 import { InputText } from "primereact/inputtext";
 import { Image } from "primereact/image";
+import { Calendar } from "primereact/calendar";
 
 type Props = {
   productId: number | null;
@@ -46,53 +47,66 @@ export function ProductDetail({ productId, visible, onClose }: Props) {
     setProduct(response.data);
   };
 
-  const gridItemContainerStyle = () => {
-    return "flex flex-col";
-  };
+  const gridItemContainerClass = "flex flex-col";
+  const labelClass = `text-[var(--text-color-secondary)] mb-2 ml-0`;
 
   return (
     <Dialog
       visible={visible}
       onHide={() => onClose()}
       modal
-      header={product ? product.name : "New Article"}
+      dismissableMask
+      header={
+        <div className="flex flex-col">
+          <label className="text-base font-normal">Description</label>
+
+          <input
+            className="input-clear text-[var(--primary-color)]"
+            value={product ? product.name : "New Article"}
+          ></input>
+        </div>
+      }
+      className="m-20"
     >
-      <div className="grid grid-cols-3 gap-x-16 gap-y-5">
-        <div className={gridItemContainerStyle()}>
-          <label className="mb-1 ml-1">Product ID</label>
+      <div className="grid grid-cols-3 gap-x-16 gap-y-5 max-w-screen-xl">
+        <div className={gridItemContainerClass}>
+          <label className={labelClass}>Number</label>
           <InputNumber value={product.id} />
         </div>
-        <div className={gridItemContainerStyle()}>
-          <label className="mb-1 ml-1">Category</label>
+        <div className={gridItemContainerClass}>
+          <label className={labelClass}>Category</label>
           <InputText value={product.category_name} />
         </div>
-        <div className="row-span-3">
-          <label className="mb-1 ml-1"></label>
-          <Image src="src/assets/resistor.png" preview />
+        <div className="row-span-6">
+          <label className={labelClass}></label>
+          <Image
+            src="src/assets/resistor.png"
+            preview
+            width="300"
+            className="mt-6"
+          />
         </div>
-        <div className={gridItemContainerStyle()}>
-          <label className="mb-1 ml-1">Description</label>
-          <InputText value={product.name} />
+        <div className={gridItemContainerClass}>
+          <label className={labelClass}>Manufacturer</label>
+          <InputText value={product.manufacture} />
         </div>
-        <div className={gridItemContainerStyle()}>
-          <label className="mb-1 ml-1">Supplier</label>
-          <InputText value={product.name} />
+        <div className={gridItemContainerClass}>
+          <label className={labelClass}>Manufacturer number</label>
+          <InputText value={product.manufacture_number} />
         </div>
-        <div className={gridItemContainerStyle()}>
-          <label className="mb-1 ml-1">Product ID</label>
-          <InputNumber value={product.id} />
+        <div className={gridItemContainerClass}>
+          <label className={labelClass}>Storage place</label>
+          <InputText value={"Box3 32-43"} />
         </div>
-        <div className={gridItemContainerStyle()}>
-          <label className="mb-1 ml-1">Product ID</label>
-          <InputNumber value={product.id} />
-        </div>
-        <div className={gridItemContainerStyle()}>
-          <label className="mb-1 ml-1">Product ID</label>
-          <InputNumber value={product.id} />
-        </div>
-        <div className={gridItemContainerStyle()}>
-          <label className="mb-1 ml-1">Product ID</label>
-          <InputNumber value={product.id} />
+        <div className="flex gap-12 justify-between">
+          <div className={gridItemContainerClass}>
+            <label className={labelClass}>Created</label>
+            <Calendar value={new Date(product.created_at)} />
+          </div>
+          <div className={gridItemContainerClass}>
+            <label className={labelClass}>Updated</label>
+            <Calendar value={new Date(product.created_at)} />
+          </div>
         </div>
       </div>
     </Dialog>
