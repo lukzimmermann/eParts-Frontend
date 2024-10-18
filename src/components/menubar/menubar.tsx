@@ -1,5 +1,4 @@
 import { useContext, useState } from "react";
-import { Button } from "primereact/button";
 import { Sidebar } from "primereact/sidebar";
 import { useNavigate } from "react-router-dom";
 import { logOut } from "../../store/auth";
@@ -10,7 +9,7 @@ import { toggleDarkMode } from "../../store/theme";
 import { InputSwitch } from "primereact/inputswitch";
 import MenuItem from "./menuItem";
 import { Avatar } from "primereact/avatar";
-import { Menu } from "primereact/menu";
+import { apiCall, Method } from "../../modules/utils/apiCall";
 
 interface MenuItem {
   id: number;
@@ -59,12 +58,14 @@ export function Menubar({ isVisible, onMenubarClick }: Props) {
   const dispatch = useAppDispatch();
   const { changeTheme } = useContext(PrimeReactContext);
   const isDarkMode = useAppSelector((state) => state.theme.isDarkMode);
+  const user = useAppSelector((state) => state.auth.user);
 
   const handleThemeChange = () => {
     dispatch(toggleDarkMode({ changeTheme }));
   };
 
-  const handleLogoutClick = () => {
+  const handleLogoutClick = async () => {
+    await apiCall<any>(Method.POST, "auth/logout", null);
     dispatch(logOut());
     navigate("/");
   };
@@ -85,9 +86,9 @@ export function Menubar({ isVisible, onMenubarClick }: Props) {
               size="xlarge"
               shape="circle"
             />
-            <label className="mt-3">Lukas Zimmermann</label>
+            <label className="mt-3">{`${user.first_name} ${user.last_name}`}</label>
             <label className="text-[var(--text-color-secondary)] text-sm">
-              Software Engineer
+              {user.job_title}
             </label>
           </div>
         </div>

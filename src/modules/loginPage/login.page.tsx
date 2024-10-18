@@ -17,13 +17,13 @@ export function LoginPage() {
 
   const handleLoginClick = async () => {
     const payload = {
-      username: username,
+      email: username,
       password: password,
     };
 
     const response = await apiCall<any>(Method.POST, "auth/login", payload);
 
-    if (response.data.message === "Login successful") {
+    if (response.data) {
       dispatch(logIn());
       navigate("/");
     }

@@ -1,14 +1,19 @@
 // src/authSlice.ts
 import { createSlice } from '@reduxjs/toolkit';
+import { apiCall, Method } from '../modules/utils/apiCall';
+import { User } from '../models/user';
 
-// Define the initial state type
+
 interface AuthState {
   isLoggedIn: boolean;
+  user: User
 }
 
-// Define the initial state
+const response = await apiCall<any>(Method.GET, "auth/", null);
+
 const initialState: AuthState = {
-  isLoggedIn: false,
+  isLoggedIn: response.data ? true : false,
+  user: response.data ? response.data : undefined
 };
 
 const authSlice = createSlice({
