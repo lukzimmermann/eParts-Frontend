@@ -21,7 +21,7 @@ function ProductSpecification({ title, dataSet }: Props) {
   }, []);
 
   useEffect(() => {
-    // console.log(data);
+    console.log(data);
   }, [data]);
 
   const getAttributes = async () => {
@@ -43,14 +43,21 @@ function ProductSpecification({ title, dataSet }: Props) {
   };
 
   const attributeValueEditor = (options: ColumnEditorOptions) => {
-    return <InputNumber type="text" value={options.value} />;
+    return (
+      <InputNumber
+        type="text"
+        maxFractionDigits={100}
+        value={options.value}
+        onChange={(e) => options.editorCallback!(e.value)}
+      />
+    );
   };
 
   const attributeNameEditor = (options: ColumnEditorOptions) => {
     return (
       <Dropdown
-        value={attributes.find((e) => options.value === e.name)}
-        options={attributes}
+        placeholder="Select a attribute"
+        options={attributes.filter((a) => !data.some((b) => a.name === b.name))}
         optionLabel="name"
         onChange={(e) => options.editorCallback!(e.value)}
         onBlur={() => options.editorCallback!(options.value)}
@@ -94,6 +101,19 @@ function ProductSpecification({ title, dataSet }: Props) {
     );
   };
 
+  const onAttributeValueComplete = (e: ColumnEvent) => {
+    setData(
+      data.map((a) =>
+        a.name === e.rowData.name
+          ? {
+              ...a,
+              numeric_value: e.newValue,
+            }
+          : a
+      )
+    );
+  };
+
   const onAttributeUnitComplete = (e: ColumnEvent) => {
     const oldUnit = units.find((u) => u.name === e.rowData.unit_name);
     const newUnit = units.find((u) => u.name === e.newValue.name);
@@ -107,8 +127,11 @@ function ProductSpecification({ title, dataSet }: Props) {
               ...a,
               unit_id: e.newValue.id,
               unit_name: e.newValue.name,
-              numeric_value:
-                (a.numeric_value * oldUnit.factor) / newUnit.factor,
+              numeric_value: parseFloat(
+                ((a.numeric_value * oldUnit.factor) / newUnit.factor).toFixed(
+                  12
+                )
+              ),
             }
           : a
       )
@@ -134,6 +157,7 @@ function ProductSpecification({ title, dataSet }: Props) {
           header="Value"
           field="numeric_value"
           editor={(options) => attributeValueEditor(options)}
+          onCellEditComplete={onAttributeValueComplete}
           align="right"
         ></Column>
         <Column
