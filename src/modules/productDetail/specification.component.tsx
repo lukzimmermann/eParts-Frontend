@@ -21,7 +21,7 @@ function ProductSpecification({ title, dataSet }: Props) {
   }, []);
 
   useEffect(() => {
-    console.log(data);
+    // console.log(data);
   }, [data]);
 
   const getAttributes = async () => {
@@ -73,22 +73,21 @@ function ProductSpecification({ title, dataSet }: Props) {
   };
 
   const onAttributeNameComplete = (e: ColumnEvent) => {
-    console.log(e);
-    const { newValue, rowData } = e;
-    const { unit_id, id, parent_id, name } = newValue;
-
-    const unitName = units.find((u) => u.id === e.newValue.unit_id)?.name;
+    if (!e.newValue.id) {
+      return;
+    }
 
     setData(
       data.map((a) =>
-        a.name === rowData.name
+        a.name === e.rowData.name
           ? {
               ...a,
-              id,
-              parent_id,
-              name,
-              unit_id,
-              unit_name: unitName,
+              id: e.newValue.id,
+              name: e.newValue.name,
+              parent_id: e.newValue.parent_id,
+              unit_base_id: e.newValue.unit_id,
+              unit_id: e.newValue.unit_id,
+              unit_name: units.find((u) => u.id === e.newValue.unit_id)?.name,
             }
           : a
       )
