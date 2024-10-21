@@ -21,7 +21,7 @@ function ProductSpecification({ title, dataSet }: Props) {
   }, []);
 
   useEffect(() => {
-    console.log(units);
+    console.log(data);
   }, [data]);
 
   const getAttributes = async () => {
@@ -53,6 +53,7 @@ function ProductSpecification({ title, dataSet }: Props) {
         options={attributes}
         optionLabel="name"
         onChange={(e) => options.editorCallback!(e.value)}
+        onBlur={() => options.editorCallback!(options.value)}
       />
     );
   };
@@ -61,18 +62,22 @@ function ProductSpecification({ title, dataSet }: Props) {
     return (
       <Dropdown
         value={units.find((e) => options.value === e.name)}
-        options={units.filter((e) => options.rowData.unit_id === e.parent_id)}
+        options={units.filter(
+          (e) => options.rowData.unit_base_id === e.parent_id
+        )}
         optionLabel="name"
         onChange={(e) => options.editorCallback!(e.value)}
+        onBlur={() => options.editorCallback!(options.value)}
       />
     );
   };
 
   const onAttributeNameComplete = (e: ColumnEvent) => {
+    console.log(e);
     const { newValue, rowData } = e;
     const { unit_id, id, parent_id, name } = newValue;
 
-    const unitName = units.find((u) => u.id === unit_id)?.name;
+    const unitName = units.find((u) => u.id === e.newValue.unit_id)?.name;
 
     setData(
       data.map((a) =>
@@ -93,15 +98,15 @@ function ProductSpecification({ title, dataSet }: Props) {
   const onAttributeUnitComplete = (e: ColumnEvent) => {
     const oldUnit = units.find((u) => u.name === e.rowData.unit_name);
     const newUnit = units.find((u) => u.name === e.newValue.name);
-
-    console.log(oldUnit.name, oldUnit.factor);
-    console.log(newUnit.name, newUnit.factor);
-
+    if (!oldUnit || !newUnit) {
+      return;
+    }
     setData(
       data.map((a) =>
         a.name === e.rowData.name
           ? {
               ...a,
+              unit_id: e.newValue.id,
               unit_name: e.newValue.name,
               numeric_value:
                 (a.numeric_value * oldUnit.factor) / newUnit.factor,
