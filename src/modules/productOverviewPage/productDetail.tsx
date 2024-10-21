@@ -45,6 +45,7 @@ export function ProductDetail({ productId, visible, onClose }: Props) {
       undefined
     );
     setProduct(response.data);
+    console.log(response);
   };
 
   const gridItemContainerClass = "flex flex-col";

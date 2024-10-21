@@ -52,7 +52,7 @@ type Props = {
 
 export function Menubar({ isVisible, onMenubarClick }: Props) {
   const [currentMenuItem, setCurrentMenuItem] = useState<MenuItem>(
-    menuItems[0]
+    menuItems[2]
   );
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -86,9 +86,11 @@ export function Menubar({ isVisible, onMenubarClick }: Props) {
               size="xlarge"
               shape="circle"
             />
-            <label className="mt-3">{`${user.first_name} ${user.last_name}`}</label>
+            <label className="mt-3">
+              {user ? `${user.first_name} ${user.last_name}` : ""}
+            </label>
             <label className="text-[var(--text-color-secondary)] text-sm">
-              {user.job_title}
+              {user ? user.job_title : ""}
             </label>
           </div>
         </div>

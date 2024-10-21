@@ -7,6 +7,13 @@ export const store = configureStore({
     auth: authReducer,
     theme: themeReduce,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: ['theme/darkModeOn', 'theme/darkModeOff'],
+        ignoredPaths: ['theme.changeTheme'],
+      },
+    }),
 });
 
 // Define RootState and AppDispatch types
