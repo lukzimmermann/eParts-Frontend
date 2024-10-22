@@ -1,9 +1,13 @@
 import { Column, ColumnEditorOptions, ColumnEvent } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { apiCall, Method } from "../utils/apiCall";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Dropdown } from "primereact/dropdown";
 import { InputNumber } from "primereact/inputnumber";
+import { ContextMenu } from "primereact/contextmenu";
+import { Button } from "primereact/button";
+import { OverlayPanel } from "primereact/overlaypanel";
+import MenuItem from "../../components/menubar/menuItem";
 
 type Props = {
   title: string;
@@ -14,6 +18,9 @@ function ProductSpecification({ title, dataSet }: Props) {
   const [data, setData] = useState<any>(dataSet);
   const [attributes, setAttributes] = useState<any>(undefined);
   const [units, setUnits] = useState<any>(undefined);
+  const [selectedAttribute, setSelectedAttribute] = useState<any | null>(null);
+  const contextMenuRef = useRef<ContextMenu>(null);
+  const overlayPanelRef = useRef(null);
 
   useEffect(() => {
     getAttributes();
@@ -138,15 +145,88 @@ function ProductSpecification({ title, dataSet }: Props) {
     );
   };
 
+  const menuModel = [
+    {
+      label: "View",
+      icon: "pi pi-fw pi-search",
+      command: () => console.log(selectedAttribute),
+    },
+    {
+      label: "Delete",
+      icon: "pi pi-fw pi-times",
+      command: () => deleteAttribute(),
+    },
+  ];
+
+  const deleteAttribute = () => {
+    setData(data.filter((e) => !(e.name === selectedAttribute.name)));
+  };
+
+  const addAttribute = (e) => {
+    overlayPanelRef.current.toggle(e);
+    setData([
+      ...data,
+      {
+        id: null,
+        parent_id: null,
+        name: null,
+        numeric_value: null,
+        text_value: null,
+        unit_base_id: null,
+        unit_id: null,
+        unit_name: null,
+      },
+    ]);
+  };
+
   return (
     <div>
-      <label className="text-[var(--text-color-secondary)] text-xl ml-1">
-        {title}
-      </label>
+      <div className="flex justify-between items-center">
+        <label className="text-[var(--text-color-secondary)] text-xl ml-1 select-none">
+          {title}
+        </label>
+        <Button
+          icon="pi pi-ellipsis-v"
+          rounded
+          text
+          // size="large"
+          style={{ height: "2rem", width: "2rem" }}
+          severity="secondary"
+          onClick={(e) => overlayPanelRef.current.toggle(e)}
+        />
+        <OverlayPanel ref={overlayPanelRef} className="m-0 p-0">
+          <div className="flex flex-col">
+            <Button
+              className="text-[var(--text-color)]"
+              text
+              onClick={(e) => addAttribute(e)}
+            >
+              Add new attribute
+            </Button>
+          </div>
+        </OverlayPanel>
+      </div>
       <div className="h-px bg-[var(--text-color-secondary)] mt-2 mb-1" />
-      <DataTable value={data} showHeaders={false} size="small" editMode="cell">
+      <ContextMenu
+        model={menuModel}
+        ref={contextMenuRef}
+        onHide={() => setSelectedAttribute(null)}
+      />
+      <DataTable
+        value={data}
+        showHeaders={false}
+        size="small"
+        editMode="cell"
+        reorderableRows
+        onContextMenu={(e) => contextMenuRef.current.show(e.originalEvent)}
+        contextMenuSelection={selectedAttribute}
+        onRowReorder={(e) => setData(e.value)}
+        onContextMenuSelectionChange={(e) => setSelectedAttribute(e.value)}
+      >
+        {/* <Column rowReorder style={{ width: "3rem" }} /> */}
         <Column
           key="name"
+          columnKey="name"
           header="Name"
           field="name"
           editor={(options) => attributeNameEditor(options)}
@@ -154,6 +234,7 @@ function ProductSpecification({ title, dataSet }: Props) {
         ></Column>
         <Column
           key="numeric_value"
+          columnKey="numeric_value"
           header="Value"
           field="numeric_value"
           editor={(options) => attributeValueEditor(options)}
@@ -162,6 +243,7 @@ function ProductSpecification({ title, dataSet }: Props) {
         ></Column>
         <Column
           key="unit_name"
+          columnKey="unit_name"
           header="Unit"
           field="unit_name"
           editor={(options) => attributeUnitEditor(options)}

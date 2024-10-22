@@ -1,5 +1,6 @@
 import type { Preview } from "@storybook/react";
 import "../src/index.css";
+import "primeicons/primeicons.css";
 // import "/themes/lara-dark/theme.css";
 
 const preview: Preview = {
