@@ -47,3 +47,7 @@ body {
     border-color: transparent;
   }
 }
+
+.overlaypanel-content-p-0 .p-overlaypanel-content {
+  padding: 0
+}

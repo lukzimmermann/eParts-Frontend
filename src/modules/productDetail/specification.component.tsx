@@ -7,7 +7,6 @@ import { InputNumber } from "primereact/inputnumber";
 import { ContextMenu } from "primereact/contextmenu";
 import { Button } from "primereact/button";
 import { OverlayPanel } from "primereact/overlaypanel";
-import MenuItem from "../../components/menubar/menuItem";
 
 type Props = {
   title: string;
@@ -147,12 +146,12 @@ function ProductSpecification({ title, dataSet }: Props) {
 
   const menuModel = [
     {
-      label: "View",
-      icon: "pi pi-fw pi-search",
-      command: () => console.log(selectedAttribute),
+      label: "Add new attribute",
+      icon: "pi pi-fw pi-plus",
+      command: (e) => addAttribute(e, true),
     },
     {
-      label: "Delete",
+      label: "Delete attribute",
       icon: "pi pi-fw pi-times",
       command: () => deleteAttribute(),
     },
@@ -162,25 +161,35 @@ function ProductSpecification({ title, dataSet }: Props) {
     setData(data.filter((e) => !(e.name === selectedAttribute.name)));
   };
 
-  const addAttribute = (e) => {
-    overlayPanelRef.current.toggle(e);
-    setData([
-      ...data,
-      {
-        id: null,
-        parent_id: null,
-        name: null,
-        numeric_value: null,
-        text_value: null,
-        unit_base_id: null,
-        unit_id: null,
-        unit_name: null,
-      },
-    ]);
+  const addAttribute = (e, isContextSource) => {
+    if (isContextSource) contextMenuRef.current.hide(e);
+    else overlayPanelRef.current.toggle(e);
+
+    const existNewAttribute = data.find(
+      (item) => item.name === "New Attribute"
+    );
+
+    if (!existNewAttribute) {
+      setData([
+        ...data,
+        {
+          id: null,
+          parent_id: null,
+          name: "New Attribute",
+          numeric_value: null,
+          text_value: null,
+          unit_base_id: null,
+          unit_id: null,
+          unit_name: null,
+        },
+      ]);
+    } else {
+      console.log("No action, currently a new attribute exists");
+    }
   };
 
   return (
-    <div>
+    <div className="container">
       <div className="flex justify-between items-center">
         <label className="text-[var(--text-color-secondary)] text-xl ml-1 select-none">
           {title}
@@ -194,12 +203,15 @@ function ProductSpecification({ title, dataSet }: Props) {
           severity="secondary"
           onClick={(e) => overlayPanelRef.current.toggle(e)}
         />
-        <OverlayPanel ref={overlayPanelRef} className="m-0 p-0">
+        <OverlayPanel
+          ref={overlayPanelRef}
+          className="overlaypanel-content-p-0"
+        >
           <div className="flex flex-col">
             <Button
-              className="text-[var(--text-color)]"
+              className="text-[var(--text-color)] m-0"
               text
-              onClick={(e) => addAttribute(e)}
+              onClick={(e) => addAttribute(e, false)}
             >
               Add new attribute
             </Button>
