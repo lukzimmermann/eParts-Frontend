@@ -23,6 +23,7 @@ export interface ProductAttribute {
   unit_id: number; // Unit ID (integer)
   unit_base_id: number;
   unit_name: string; // Unit name (string)
+  position: number;
 }
 
 export interface Attribute {

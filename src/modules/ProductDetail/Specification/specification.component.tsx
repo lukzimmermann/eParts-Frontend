@@ -7,6 +7,7 @@ import { ContextMenu } from "primereact/contextmenu";
 import { Button } from "primereact/button";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { Attribute, ProductAttribute, Unit } from "@/interfaces/product";
+import { InputText } from "primereact/inputtext";
 
 type Props = {
   title: string;
@@ -21,7 +22,9 @@ function ProductSpecification({
   attributeSet,
   unitSet,
 }: Props) {
-  const [data, setData] = useState<ProductAttribute[]>(dataSet);
+  const [data, setData] = useState<ProductAttribute[]>(
+    dataSet.sort((a, b) => a.position - b.position)
+  );
   const [attributes] = useState<Attribute[]>(attributeSet);
   const [units] = useState<Unit[]>(unitSet);
   const [selectedAttribute, setSelectedAttribute] = useState<Attribute | null>(
@@ -29,17 +32,6 @@ function ProductSpecification({
   );
   const contextMenuRef = useRef<ContextMenu>(null);
   const overlayPanelRef = useRef(null);
-
-  const attributeValueEditor = (options: ColumnEditorOptions) => {
-    return (
-      <InputNumber
-        type="text"
-        maxFractionDigits={100}
-        value={options.value}
-        onChange={(e) => options.editorCallback!(e.value)}
-      />
-    );
-  };
 
   const attributeNameEditor = (options: ColumnEditorOptions) => {
     return (
@@ -53,10 +45,33 @@ function ProductSpecification({
     );
   };
 
+  const attributeValueEditor = (options: ColumnEditorOptions) => {
+    if (options.rowData.text_value) {
+      return (
+        <InputText
+          type="text"
+          value={options.rowData.text_value}
+          onChange={(e) => options.editorCallback(e.target.value)}
+          onKeyDown={(e) => e.stopPropagation()}
+        />
+      );
+    } else {
+      return (
+        <InputNumber
+          type="text"
+          maxFractionDigits={12}
+          value={options.rowData.numeric_value}
+          onChange={(e) => options.editorCallback!(e.value)}
+          onKeyDown={(e) => e.stopPropagation()}
+        />
+      );
+    }
+  };
   const attributeUnitEditor = (options: ColumnEditorOptions) => {
+    console.log(options);
     return (
       <Dropdown
-        value={units.find((e) => options.value === e.name)}
+        value={units.find((e) => options.rowData.unit_name === e.name)}
         options={units.filter(
           (e) => options.rowData.unit_base_id === e.parent_id
         )}
@@ -90,16 +105,29 @@ function ProductSpecification({
   };
 
   const onAttributeValueComplete = (e: ColumnEvent) => {
-    setData(
-      data.map((a) =>
-        a.name === e.rowData.name
-          ? {
-              ...a,
-              numeric_value: e.newValue,
-            }
-          : a
-      )
-    );
+    if (e.rowData.text_value) {
+      setData(
+        data.map((a) =>
+          a.name === e.rowData.name
+            ? {
+                ...a,
+                text_value: e.rowData.text_value,
+              }
+            : a
+        )
+      );
+    } else {
+      setData(
+        data.map((a) =>
+          a.name === e.rowData.name
+            ? {
+                ...a,
+                numeric_value: e.rowData.numeric_vale,
+              }
+            : a
+        )
+      );
+    }
   };
 
   const onAttributeUnitComplete = (e: ColumnEvent) => {
@@ -163,11 +191,20 @@ function ProductSpecification({
           unit_base_id: null,
           unit_id: null,
           unit_name: null,
+          position: 100,
         },
       ]);
     } else {
       console.log("No action, currently a new attribute exists");
     }
+  };
+
+  const handleOnReorderRow = (e) => {
+    e.value.forEach((item, index) => {
+      item.position = index;
+    });
+    console.log(e);
+    setData(e.value.sort((a, b) => a.position - b.position));
   };
 
   return (
@@ -213,7 +250,7 @@ function ProductSpecification({
         reorderableRows
         onContextMenu={(e) => contextMenuRef.current.show(e.originalEvent)}
         contextMenuSelection={selectedAttribute}
-        onRowReorder={(e) => setData(e.value)}
+        onRowReorder={(e) => handleOnReorderRow(e)}
         onContextMenuSelectionChange={(e) => setSelectedAttribute(e.value)}
       >
         <Column
@@ -228,7 +265,11 @@ function ProductSpecification({
           key="numeric_value"
           columnKey="numeric_value"
           header="Value"
-          field="numeric_value"
+          body={(rowData) =>
+            rowData.text_value != null
+              ? rowData.text_value
+              : rowData.numeric_value
+          }
           editor={(options) => attributeValueEditor(options)}
           onCellEditComplete={onAttributeValueComplete}
           align="right"
@@ -237,8 +278,14 @@ function ProductSpecification({
           key="unit_name"
           columnKey="unit_name"
           header="Unit"
-          field="unit_name"
-          editor={(options) => attributeUnitEditor(options)}
+          body={(rowData) =>
+            rowData.unit_name != "NO_UNIT" ? rowData.unit_name : null
+          }
+          editor={(options) =>
+            options.rowData.unit_name != "NO_UNIT"
+              ? attributeUnitEditor(options)
+              : null
+          }
           onCellEditComplete={onAttributeUnitComplete}
           align="left"
           style={{ width: "1rem" }}
