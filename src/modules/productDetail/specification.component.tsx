@@ -1,17 +1,18 @@
 import { Column, ColumnEditorOptions, ColumnEvent } from "primereact/column";
 import { DataTable } from "primereact/datatable";
-import { useRef, useState } from "react";
+import { Attributes, useRef, useState } from "react";
 import { Dropdown } from "primereact/dropdown";
 import { InputNumber } from "primereact/inputnumber";
 import { ContextMenu } from "primereact/contextmenu";
 import { Button } from "primereact/button";
 import { OverlayPanel } from "primereact/overlaypanel";
+import { Attribute, ProductAttribute, Unit } from "../../interfaces/product";
 
 type Props = {
   title: string;
-  dataSet: any;
-  attributeSet: any;
-  unitSet: any;
+  dataSet: ProductAttribute[];
+  attributeSet: Attribute[];
+  unitSet: Unit[];
 };
 
 function ProductSpecification({
@@ -20,10 +21,12 @@ function ProductSpecification({
   attributeSet,
   unitSet,
 }: Props) {
-  const [data, setData] = useState<any>(dataSet);
-  const [attributes] = useState<any>(attributeSet);
-  const [units] = useState<any>(unitSet);
-  const [selectedAttribute, setSelectedAttribute] = useState<any | null>(null);
+  const [data, setData] = useState<ProductAttribute[]>(dataSet);
+  const [attributes] = useState<Attribute[]>(attributeSet);
+  const [units] = useState<Unit[]>(unitSet);
+  const [selectedAttribute, setSelectedAttribute] = useState<Attribute | null>(
+    null
+  );
   const contextMenuRef = useRef<ContextMenu>(null);
   const overlayPanelRef = useRef(null);
 
@@ -177,7 +180,6 @@ function ProductSpecification({
           icon="pi pi-ellipsis-v"
           rounded
           text
-          // size="large"
           style={{ height: "2rem", width: "2rem" }}
           severity="secondary"
           onClick={(e) => overlayPanelRef.current.toggle(e)}
@@ -214,7 +216,6 @@ function ProductSpecification({
         onRowReorder={(e) => setData(e.value)}
         onContextMenuSelectionChange={(e) => setSelectedAttribute(e.value)}
       >
-        {/* <Column rowReorder style={{ width: "3rem" }} /> */}
         <Column
           key="name"
           columnKey="name"

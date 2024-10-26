@@ -1,6 +1,5 @@
 import { Meta, StoryObj } from "@storybook/react";
 import ProductSpecification from "./specification.component";
-
 const meta: Meta<typeof ProductSpecification> = {
   title: "Product Specification",
   component: ProductSpecification,
