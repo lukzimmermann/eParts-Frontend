@@ -1,7 +1,6 @@
 import { Column, ColumnEditorOptions, ColumnEvent } from "primereact/column";
 import { DataTable } from "primereact/datatable";
-import { apiCall, Method } from "../utils/apiCall";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Dropdown } from "primereact/dropdown";
 import { InputNumber } from "primereact/inputnumber";
 import { ContextMenu } from "primereact/contextmenu";
@@ -11,42 +10,22 @@ import { OverlayPanel } from "primereact/overlaypanel";
 type Props = {
   title: string;
   dataSet: any;
+  attributeSet: any;
+  unitSet: any;
 };
 
-function ProductSpecification({ title, dataSet }: Props) {
+function ProductSpecification({
+  title,
+  dataSet,
+  attributeSet,
+  unitSet,
+}: Props) {
   const [data, setData] = useState<any>(dataSet);
-  const [attributes, setAttributes] = useState<any>(undefined);
-  const [units, setUnits] = useState<any>(undefined);
+  const [attributes] = useState<any>(attributeSet);
+  const [units] = useState<any>(unitSet);
   const [selectedAttribute, setSelectedAttribute] = useState<any | null>(null);
   const contextMenuRef = useRef<ContextMenu>(null);
   const overlayPanelRef = useRef(null);
-
-  useEffect(() => {
-    getAttributes();
-    getUnits();
-  }, []);
-
-  useEffect(() => {
-    console.log(data);
-  }, [data]);
-
-  const getAttributes = async () => {
-    const response = await apiCall<any>(
-      Method.GET,
-      `/product/attributes`,
-      undefined
-    );
-    setAttributes(response.data);
-  };
-
-  const getUnits = async () => {
-    const response = await apiCall<any>(
-      Method.GET,
-      `/product/units`,
-      undefined
-    );
-    setUnits(response.data);
-  };
 
   const attributeValueEditor = (options: ColumnEditorOptions) => {
     return (
