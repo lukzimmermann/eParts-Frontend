@@ -1,13 +1,13 @@
 import { useDispatch } from "react-redux";
-import { useAppSelector } from "./hooks/hooks";
+import { useAppSelector } from "@/hooks/hooks";
 import { PrimeReactContext } from "primereact/api";
-import { Header } from "./components/header/header";
-import { Menubar } from "./components/menubar/menubar";
+import { Header } from "@/components/header/header";
+import { Menubar } from "@/components/menubar/menubar";
 import { useContext, useEffect, useState } from "react";
-import { darkModeOn, darkModeOff } from "./store/theme";
-import { LoginPage } from "./modules/LoginPage/login.page";
+import { darkModeOn, darkModeOff } from "@/store/theme";
+import { LoginPage } from "@/modules/LoginPage/login.page";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom"; // Use BrowserRouter here
-import { ProductOverview } from "./modules/ProductOverviewPage/productOverview.page";
+import { ProductOverview } from "@/modules/ProductOverviewPage/productOverview.page";
 
 function App() {
   const dispatch = useDispatch();

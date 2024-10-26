@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
-import { logIn } from "../../store/auth";
+import { logIn } from "@/store/auth";
 import { useNavigate } from "react-router-dom";
 import { IconField } from "primereact/iconfield";
 import { InputIcon } from "primereact/inputicon";
 import { InputText } from "primereact/inputtext";
-import { apiCall, Method } from "../utils/apiCall";
-import { useAppDispatch } from "../../hooks/hooks";
+import { apiCall, Method } from "@/utils/apiCall";
+import { useAppDispatch } from "@/hooks/hooks";
 
 export function LoginPage() {
   const [username, setUsername] = useState<string>(undefined);

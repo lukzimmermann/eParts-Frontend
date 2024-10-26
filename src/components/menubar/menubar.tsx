@@ -9,7 +9,7 @@ import { toggleDarkMode } from "../../store/theme";
 import { InputSwitch } from "primereact/inputswitch";
 import MenuItem from "./menuItem";
 import { Avatar } from "primereact/avatar";
-import { apiCall, Method } from "../../modules/utils/apiCall";
+import { apiCall, Method } from "../../utils/apiCall";
 
 interface MenuItem {
   id: number;

@@ -1,8 +1,8 @@
-import "./App.css";
-import "./index.css";
-import App from "./App";
+import "@/App.css";
+import "@/index.css";
+import App from "@/App";
 import React from "react";
-import store from "./store/store";
+import store from "@/store/store";
 import "primeicons/primeicons.css";
 import { Provider } from "react-redux";
 import ReactDOM from "react-dom/client";

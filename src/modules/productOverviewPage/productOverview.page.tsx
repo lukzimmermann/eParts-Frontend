@@ -1,9 +1,8 @@
 import { Column } from "primereact/column";
-import { DataTable, DataTableValue } from "primereact/datatable";
-import React, { useEffect, useState } from "react";
-import { apiCall, Method } from "../utils/apiCall";
+import { DataTable } from "primereact/datatable";
+import { useEffect, useState } from "react";
+import { apiCall, Method } from "@/utils/apiCall";
 import { ProductDetail } from "./productDetail";
-import { Product } from "../../interfaces/product";
 
 export const ProductOverview = () => {
   const [products, setProducts] = useState<any>(undefined);

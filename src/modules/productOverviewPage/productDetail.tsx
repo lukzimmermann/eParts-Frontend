@@ -1,7 +1,7 @@
 import { Dialog } from "primereact/dialog";
 import { useEffect, useState } from "react";
-import { apiCall, Method } from "../utils/apiCall";
-import { Product } from "../../interfaces/product";
+import { apiCall, Method } from "@/utils/apiCall";
+import { Product } from "@/interfaces/product";
 import { InputNumber } from "primereact/inputnumber";
 import { InputText } from "primereact/inputtext";
 import { Image } from "primereact/image";

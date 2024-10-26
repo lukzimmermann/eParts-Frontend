@@ -1,6 +1,6 @@
-import { configureStore } from '@reduxjs/toolkit';
-import authReducer from './auth';
-import themeReduce from './theme'
+import { configureStore } from "@reduxjs/toolkit";
+import authReducer from "@/store/auth";
+import themeReduce from "@/store/theme";
 
 export const store = configureStore({
   reducer: {
@@ -10,8 +10,8 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        ignoredActions: ['theme/darkModeOn', 'theme/darkModeOff'],
-        ignoredPaths: ['theme.changeTheme'],
+        ignoredActions: ["theme/darkModeOn", "theme/darkModeOff"],
+        ignoredPaths: ["theme.changeTheme"],
       },
     }),
 });

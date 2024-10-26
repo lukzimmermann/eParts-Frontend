@@ -1,12 +1,12 @@
 import { Column, ColumnEditorOptions, ColumnEvent } from "primereact/column";
 import { DataTable } from "primereact/datatable";
-import { Attributes, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Dropdown } from "primereact/dropdown";
 import { InputNumber } from "primereact/inputnumber";
 import { ContextMenu } from "primereact/contextmenu";
 import { Button } from "primereact/button";
 import { OverlayPanel } from "primereact/overlaypanel";
-import { Attribute, ProductAttribute, Unit } from "../../interfaces/product";
+import { Attribute, ProductAttribute, Unit } from "@/interfaces/product";
 
 type Props = {
   title: string;
