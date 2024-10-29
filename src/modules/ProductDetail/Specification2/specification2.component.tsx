@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Dropdown } from "primereact/dropdown";
 import { InputNumber } from "primereact/inputnumber";
 import { ContextMenu } from "primereact/contextmenu";
@@ -7,6 +7,7 @@ import { OverlayPanel } from "primereact/overlaypanel";
 import { Attribute, ProductAttribute, Unit } from "@/interfaces/product";
 import { InputText } from "primereact/inputtext";
 import SpecificationItem from "./specificationItem.component";
+import { motion } from "framer-motion";
 
 type Props = {
   title: string;
@@ -26,6 +27,7 @@ function ProductSpecification2({
   );
   const [attributes] = useState<Attribute[]>(attributeSet);
   const [units] = useState<Unit[]>(unitSet);
+  const [dragAttribute, setDragAttribute] = useState<ProductAttribute>(null);
   const [selectedAttribute, setSelectedAttribute] = useState<Attribute | null>(
     null
   );
@@ -52,9 +54,6 @@ function ProductSpecification2({
   ];
 
   const deleteAttribute = () => {
-    console.log(data);
-    console.log(selectedAttribute);
-    console.log(data.filter((e) => !(e.name === selectedAttribute.name)));
     setData(data.filter((e) => !(e.name === selectedAttribute.name)));
   };
 
@@ -86,19 +85,45 @@ function ProductSpecification2({
     }
   };
 
-  const createValueBody = (rowData) => {
-    if (rowData.text_value) {
-      return rowData.text_value;
-    } else {
-      return `${rowData.numeric_value} ${rowData.unit_name}`;
-    }
-  };
+  const handleRowReorder = (
+    dropAttribute: ProductAttribute,
+    isUpper: boolean
+  ) => {
+    console.log("DragItem:", dragAttribute.name, dragAttribute.position);
+    if (dragAttribute.name === dropAttribute.name) return;
 
-  const handleOnReorderRow = (e) => {
-    e.value.forEach((item, index) => {
-      item.position = index;
+    console.log("DropOn:", dropAttribute.name, dropAttribute.position);
+    console.log("IsUpper:", isUpper);
+
+    data.forEach((e) => {
+      console.log(e.position, e.name);
     });
-    setData(e.value.sort((a, b) => a.position - b.position));
+
+    if (dropAttribute.name === dragAttribute.name) return;
+
+    const updatedData = data.map((item) => {
+      if (item.id === dragAttribute.id) {
+        return {
+          ...item,
+          position: isUpper
+            ? dropAttribute.position - 0.5
+            : dropAttribute.position + 0.5,
+        };
+      }
+      return item;
+    });
+    console.log("vvvvvvvvvvvvvvvv");
+    updatedData.forEach((e) => {
+      console.log(e.position, e.name);
+    });
+
+    const reorderedData = updatedData
+      .sort((a, b) => a.position - b.position)
+      .map((item, index) => ({ ...item, position: index }));
+
+    setData(reorderedData);
+
+    console.log(data);
   };
 
   return (
@@ -139,11 +164,16 @@ function ProductSpecification2({
       <div>
         {data.map((e) => (
           <SpecificationItem
+            key={e.name}
             attributeData={e}
             attributeSet={attributeSet}
             unitSet={unitSet}
             onContextMenu={(e) => contextMenuRef.current.show(e)}
             onContextMenuSelectionChange={(e) => setSelectedAttribute(e)}
+            onRowReorder={(attribute, isUpper) =>
+              handleRowReorder(attribute, isUpper)
+            }
+            onDrag={(e) => setDragAttribute(e)}
           />
         ))}
       </div>

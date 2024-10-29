@@ -1,4 +1,5 @@
 import { Attribute, ProductAttribute, Unit } from "@/interfaces/product";
+import { motion } from "framer-motion";
 import { Button } from "primereact/button";
 import { useState } from "react";
 
@@ -8,6 +9,11 @@ type Props = {
   unitSet: Unit[];
   onContextMenu: (e) => void;
   onContextMenuSelectionChange: (e: ProductAttribute) => void;
+  onRowReorder: (
+    productAttribute: ProductAttribute,
+    isOnUpper: boolean
+  ) => void;
+  onDrag: (productAttribute: ProductAttribute) => void;
 };
 
 function SpecificationItem({
@@ -16,9 +22,10 @@ function SpecificationItem({
   unitSet,
   onContextMenu,
   onContextMenuSelectionChange,
+  onRowReorder,
+  onDrag,
 }: Props) {
   const [attribute, setAttribute] = useState<ProductAttribute>(attributeData);
-  const [isActive, setIsActive] = useState<boolean>(false);
   const [upperIndicatorActive, setUpperIndicatorActive] =
     useState<boolean>(false);
   const [lowerIndicatorActive, setLowerIndicatorActive] =
@@ -53,19 +60,32 @@ function SpecificationItem({
 
   const handleEditCancelClick = () => {};
 
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    handleDragLeave();
+  const isUpperIndicator = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const y = e.clientY - rect.top;
     if (y > (rect.bottom - rect.top) / 2) {
-      setLowerIndicatorActive(true);
+      return false;
     } else {
-      setUpperIndicatorActive(true);
+      return true;
     }
   };
-  const handleDragLeave = () => {
-    setUpperIndicatorActive(false);
-    setLowerIndicatorActive(false);
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    clearIndicator();
+    if (isUpperIndicator(e)) setUpperIndicatorActive(true);
+    else setLowerIndicatorActive(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    clearIndicator();
+  };
+
+  const handleOnDrop = (e) => {
+    e.preventDefault();
+    clearIndicator();
+    onRowReorder(attribute, isUpperIndicator(e));
   };
 
   const handleContextMenu = (e) => {
@@ -74,13 +94,22 @@ function SpecificationItem({
     onContextMenuSelectionChange(attribute);
   };
 
+  const clearIndicator = () => {
+    setUpperIndicatorActive(false);
+    setLowerIndicatorActive(false);
+  };
+
   return (
-    <div
+    <motion.div
+      layout
+      layoutId={attribute.name}
+      transition={{ duration: 0.75 }}
       draggable
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
-      onDrop={() => console.log("dropped")}
+      onDrop={handleOnDrop}
       onContextMenu={handleContextMenu}
+      onDrag={() => onDrag(attribute)}
     >
       <div
         className={
@@ -104,7 +133,7 @@ function SpecificationItem({
             : "h-px bg-[var(--surface-d)] -mt-px"
         }
       />
-    </div>
+    </motion.div>
   );
 }
 
