@@ -1,4 +1,4 @@
-import { Column, ColumnEditorOptions, ColumnEvent } from "primereact/column";
+import { Column, ColumnEditorOptions } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { useRef, useState } from "react";
 import { Dropdown } from "primereact/dropdown";
@@ -30,129 +30,13 @@ function ProductSpecification({
   const [selectedAttribute, setSelectedAttribute] = useState<Attribute | null>(
     null
   );
+  const [currentEditingAttribute, setCurrentEditingAttribute] =
+    useState<Attribute | null>();
+  const [editingRows, setEditingRows] = useState({});
   const contextMenuRef = useRef<ContextMenu>(null);
   const overlayPanelRef = useRef(null);
-
-  const attributeNameEditor = (options: ColumnEditorOptions) => {
-    return (
-      <Dropdown
-        placeholder="Select a attribute"
-        options={attributes.filter((a) => !data.some((b) => a.name === b.name))}
-        optionLabel="name"
-        onChange={(e) => options.editorCallback!(e.value)}
-        onBlur={() => options.editorCallback!(options.value)}
-      />
-    );
-  };
-
-  const attributeValueEditor = (options: ColumnEditorOptions) => {
-    if (options.rowData.text_value) {
-      return (
-        <InputText
-          type="text"
-          value={options.rowData.text_value}
-          onChange={(e) => options.editorCallback(e.target.value)}
-          onKeyDown={(e) => e.stopPropagation()}
-        />
-      );
-    } else {
-      return (
-        <InputNumber
-          type="text"
-          maxFractionDigits={12}
-          value={options.rowData.numeric_value}
-          onChange={(e) => options.editorCallback!(e.value)}
-          onKeyDown={(e) => e.stopPropagation()}
-        />
-      );
-    }
-  };
-  const attributeUnitEditor = (options: ColumnEditorOptions) => {
-    console.log(options);
-    return (
-      <Dropdown
-        value={units.find((e) => options.rowData.unit_name === e.name)}
-        options={units.filter(
-          (e) => options.rowData.unit_base_id === e.parent_id
-        )}
-        optionLabel="name"
-        onChange={(e) => options.editorCallback!(e.value)}
-        onBlur={() => options.editorCallback!(options.value)}
-      />
-    );
-  };
-
-  const onAttributeNameComplete = (e: ColumnEvent) => {
-    if (!e.newValue.id) {
-      return;
-    }
-
-    setData(
-      data.map((a) =>
-        a.name === e.rowData.name
-          ? {
-              ...a,
-              id: e.newValue.id,
-              name: e.newValue.name,
-              parent_id: e.newValue.parent_id,
-              unit_base_id: e.newValue.unit_id,
-              unit_id: e.newValue.unit_id,
-              unit_name: units.find((u) => u.id === e.newValue.unit_id)?.name,
-            }
-          : a
-      )
-    );
-  };
-
-  const onAttributeValueComplete = (e: ColumnEvent) => {
-    if (e.rowData.text_value) {
-      setData(
-        data.map((a) =>
-          a.name === e.rowData.name
-            ? {
-                ...a,
-                text_value: e.rowData.text_value,
-              }
-            : a
-        )
-      );
-    } else {
-      setData(
-        data.map((a) =>
-          a.name === e.rowData.name
-            ? {
-                ...a,
-                numeric_value: e.rowData.numeric_vale,
-              }
-            : a
-        )
-      );
-    }
-  };
-
-  const onAttributeUnitComplete = (e: ColumnEvent) => {
-    const oldUnit = units.find((u) => u.name === e.rowData.unit_name);
-    const newUnit = units.find((u) => u.name === e.newValue.name);
-    if (!oldUnit || !newUnit) {
-      return;
-    }
-    setData(
-      data.map((a) =>
-        a.name === e.rowData.name
-          ? {
-              ...a,
-              unit_id: e.newValue.id,
-              unit_name: e.newValue.name,
-              numeric_value: parseFloat(
-                ((a.numeric_value * oldUnit.factor) / newUnit.factor).toFixed(
-                  12
-                )
-              ),
-            }
-          : a
-      )
-    );
-  };
+  const valueEditorRef = useRef(null);
+  const dataTableRef = useRef(null);
 
   const menuModel = [
     {
@@ -161,17 +45,113 @@ function ProductSpecification({
       command: (e) => addAttribute(e, true),
     },
     {
+      label: "Edit attribute",
+      icon: "pi pi-fw pi-pencil",
+      command: () => {
+        setCurrentEditingAttribute(selectedAttribute);
+        setEditingRows({ ...{ [`${selectedAttribute.id}`]: true } });
+      },
+    },
+    {
       label: "Delete attribute",
       icon: "pi pi-fw pi-times",
       command: () => deleteAttribute(),
     },
   ];
 
+  const attributeNameEditor = (options: ColumnEditorOptions) => {
+    if (valueEditorRef.current)
+      valueEditorRef.current.editor = attributeValueEditor(options);
+    return (
+      <Dropdown
+        value={attributes.find((e) => options.rowData.name === e.name)}
+        //options={attributes.filter((a) => !data.some((b) => a.name === b.name))}
+        options={attributes}
+        optionLabel="name"
+        onChange={(e) => options.editorCallback!(e.value.name)}
+        onBlur={() => options.editorCallback!(options.value)}
+      />
+    );
+  };
+
+  const attributeValueEditor = (options: ColumnEditorOptions) => {
+    if (options.rowData.text_value) {
+      return (
+        <div className="flex gap-2 justify-end items-center">
+          <InputText
+            type="text"
+            value={options.rowData.text_value}
+            onChange={(e) => options.editorCallback(e.target.value)}
+            onKeyDown={(e) => e.stopPropagation()}
+          />
+          {getEditOptions()}
+        </div>
+      );
+    } else {
+      return (
+        <div className="flex gap-2 justify-end items-center">
+          <InputNumber
+            inputStyle={{ width: "6rem", textAlign: "right" }}
+            type="text"
+            maxFractionDigits={12}
+            value={options.rowData.numeric_value}
+            onChange={(e) => options.editorCallback!(e.value)}
+            onKeyDown={(e) => e.stopPropagation()}
+          />
+          <Dropdown
+            value={units.find((e) => options.rowData.unit_name === e.name)}
+            options={units.filter(
+              (e) => options.rowData.unit_base_id === e.parent_id
+            )}
+            optionLabel="name"
+            onChange={(e) => options.editorCallback!(e.value)}
+            onBlur={() => options.editorCallback!(options.value)}
+          />
+          {getEditOptions()}
+        </div>
+      );
+    }
+  };
+
+  const getEditOptions = () => {
+    return (
+      <div>
+        <Button
+          icon="pi pi-check"
+          rounded
+          outlined
+          text
+          severity="success"
+          size="large"
+          onClick={handleEditSaveClick}
+        />
+        <Button
+          icon="pi pi-times"
+          rounded
+          outlined
+          text
+          severity="secondary"
+          size="large"
+          onClick={handleEditCancelClick}
+        />
+      </div>
+    );
+  };
+
+  const handleEditSaveClick = () => {
+    console.log(currentEditingAttribute);
+    handleEditCancelClick();
+  };
+
+  const handleEditCancelClick = () => {
+    setEditingRows({});
+  };
+
   const deleteAttribute = () => {
     setData(data.filter((e) => !(e.name === selectedAttribute.name)));
   };
 
-  const addAttribute = (e, isContextSource) => {
+  const addAttribute = (e, isContextSource: boolean) => {
     if (isContextSource) contextMenuRef.current.hide(e);
     else overlayPanelRef.current.toggle(e);
 
@@ -180,22 +160,31 @@ function ProductSpecification({
     );
 
     if (!existNewAttribute) {
-      setData([
-        ...data,
-        {
-          id: null,
-          parent_id: null,
-          name: "New Attribute",
-          numeric_value: null,
-          text_value: null,
-          unit_base_id: null,
-          unit_id: null,
-          unit_name: null,
-          position: 100,
-        },
+      const newProductAttribute: ProductAttribute = {
+        id: -1,
+        parent_id: null,
+        name: "New Attribute",
+        numeric_value: null,
+        text_value: null,
+        unit_base_id: null,
+        unit_id: null,
+        unit_name: null,
+        position: 100,
+      };
+
+      setData((prevData: ProductAttribute[]) => [
+        ...prevData,
+        newProductAttribute,
       ]);
+      setEditingRows({ ...{ [`-1`]: true } });
+    }
+  };
+
+  const createValueBody = (rowData) => {
+    if (rowData.text_value) {
+      return rowData.text_value;
     } else {
-      console.log("No action, currently a new attribute exists");
+      return `${rowData.numeric_value} ${rowData.unit_name}`;
     }
   };
 
@@ -203,8 +192,16 @@ function ProductSpecification({
     e.value.forEach((item, index) => {
       item.position = index;
     });
-    console.log(e);
     setData(e.value.sort((a, b) => a.position - b.position));
+  };
+
+  const onRowEditComplete = (e: any) => {
+    console.log("EditComplete", e);
+  };
+
+  const onRowEditChange = (e: any) => {
+    console.log(e);
+    setEditingRows(e.data);
   };
 
   return (
@@ -243,10 +240,16 @@ function ProductSpecification({
         onHide={() => setSelectedAttribute(null)}
       />
       <DataTable
+        ref={dataTableRef}
         value={data}
         showHeaders={false}
         size="small"
-        editMode="cell"
+        editMode="row"
+        editingRows={editingRows}
+        dataKey="id"
+        onRowEditCancel={() => console.log("hello")}
+        onRowEditChange={onRowEditChange}
+        onRowEditComplete={onRowEditComplete}
         reorderableRows
         onContextMenu={(e) => contextMenuRef.current.show(e.originalEvent)}
         contextMenuSelection={selectedAttribute}
@@ -259,37 +262,16 @@ function ProductSpecification({
           header="Name"
           field="name"
           editor={(options) => attributeNameEditor(options)}
-          onCellEditComplete={onAttributeNameComplete}
-        ></Column>
+        />
         <Column
+          ref={valueEditorRef}
           key="numeric_value"
           columnKey="numeric_value"
           header="Value"
-          body={(rowData) =>
-            rowData.text_value != null
-              ? rowData.text_value
-              : rowData.numeric_value
-          }
+          body={(rowData) => createValueBody(rowData)}
           editor={(options) => attributeValueEditor(options)}
-          onCellEditComplete={onAttributeValueComplete}
           align="right"
-        ></Column>
-        <Column
-          key="unit_name"
-          columnKey="unit_name"
-          header="Unit"
-          body={(rowData) =>
-            rowData.unit_name != "NO_UNIT" ? rowData.unit_name : null
-          }
-          editor={(options) =>
-            options.rowData.unit_name != "NO_UNIT"
-              ? attributeUnitEditor(options)
-              : null
-          }
-          onCellEditComplete={onAttributeUnitComplete}
-          align="left"
-          style={{ width: "1rem" }}
-        ></Column>
+        />
       </DataTable>
     </div>
   );

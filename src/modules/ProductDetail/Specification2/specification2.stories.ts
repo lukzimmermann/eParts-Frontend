@@ -1,15 +1,15 @@
 import { Meta, StoryObj } from "@storybook/react";
-import ProductSpecification from "./specification.component";
+import ProductSpecification2 from "./specification2.component";
 
-const meta: Meta<typeof ProductSpecification> = {
-  title: "Product Specification",
-  component: ProductSpecification,
+const meta: Meta<typeof ProductSpecification2> = {
+  title: "Product Specification2",
+  component: ProductSpecification2,
   tags: ["autodocs"],
 };
 
 export default meta;
 
-type Story = StoryObj<typeof ProductSpecification>;
+type Story = StoryObj<typeof ProductSpecification2>;
 
 const dataSet = [
   {
