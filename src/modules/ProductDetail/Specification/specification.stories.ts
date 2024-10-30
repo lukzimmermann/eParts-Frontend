@@ -83,7 +83,7 @@ const attributeSet = [
   {
     id: 1,
     parent_id: null,
-    unit_id: 1,
+    unit_base_id: 1,
     name: "Resistance",
     is_title: false,
     is_numeric: true,
@@ -91,7 +91,7 @@ const attributeSet = [
   {
     id: 11,
     parent_id: null,
-    unit_id: 5,
+    unit_base_id: 5,
     name: "Control voltage ",
     is_title: false,
     is_numeric: true,
@@ -99,7 +99,7 @@ const attributeSet = [
   {
     id: 3,
     parent_id: null,
-    unit_id: 5,
+    unit_base_id: 5,
     name: "Forward voltage",
     is_title: false,
     is_numeric: true,
@@ -107,7 +107,7 @@ const attributeSet = [
   {
     id: 6,
     parent_id: null,
-    unit_id: 5,
+    unit_base_id: 5,
     name: "max. Voltage",
     is_title: false,
     is_numeric: true,
@@ -115,7 +115,7 @@ const attributeSet = [
   {
     id: 5,
     parent_id: null,
-    unit_id: 5,
+    unit_base_id: 5,
     name: "min. Voltage",
     is_title: false,
     is_numeric: true,
@@ -123,7 +123,7 @@ const attributeSet = [
   {
     id: 13,
     parent_id: null,
-    unit_id: 5,
+    unit_base_id: 5,
     name: "Switching voltage",
     is_title: false,
     is_numeric: true,
@@ -131,7 +131,7 @@ const attributeSet = [
   {
     id: 7,
     parent_id: null,
-    unit_id: 5,
+    unit_base_id: 5,
     name: "Voltage",
     is_title: false,
     is_numeric: true,
@@ -139,7 +139,7 @@ const attributeSet = [
   {
     id: 2,
     parent_id: null,
-    unit_id: 7,
+    unit_base_id: 7,
     name: "Tolerance",
     is_title: false,
     is_numeric: true,
@@ -147,7 +147,7 @@ const attributeSet = [
   {
     id: 19,
     parent_id: null,
-    unit_id: 9,
+    unit_base_id: 9,
     name: "max. Power",
     is_title: false,
     is_numeric: true,
@@ -155,7 +155,7 @@ const attributeSet = [
   {
     id: 18,
     parent_id: null,
-    unit_id: 9,
+    unit_base_id: 9,
     name: "min. Power",
     is_title: false,
     is_numeric: true,
@@ -163,7 +163,7 @@ const attributeSet = [
   {
     id: 17,
     parent_id: null,
-    unit_id: 9,
+    unit_base_id: 9,
     name: "Power",
     is_title: false,
     is_numeric: true,
@@ -171,7 +171,7 @@ const attributeSet = [
   {
     id: 20,
     parent_id: null,
-    unit_id: 9,
+    unit_base_id: 9,
     name: "Switching power",
     is_title: false,
     is_numeric: true,
@@ -179,7 +179,7 @@ const attributeSet = [
   {
     id: 21,
     parent_id: null,
-    unit_id: 11,
+    unit_base_id: 11,
     name: "Collector current",
     is_title: false,
     is_numeric: true,
@@ -187,7 +187,7 @@ const attributeSet = [
   {
     id: 4,
     parent_id: null,
-    unit_id: 11,
+    unit_base_id: 11,
     name: "Current",
     is_title: false,
     is_numeric: true,
@@ -195,7 +195,7 @@ const attributeSet = [
   {
     id: 9,
     parent_id: null,
-    unit_id: 11,
+    unit_base_id: 11,
     name: "max. Current",
     is_title: false,
     is_numeric: true,
@@ -203,7 +203,7 @@ const attributeSet = [
   {
     id: 8,
     parent_id: null,
-    unit_id: 11,
+    unit_base_id: 11,
     name: "min. Current",
     is_title: false,
     is_numeric: true,
@@ -211,7 +211,7 @@ const attributeSet = [
   {
     id: 12,
     parent_id: null,
-    unit_id: 11,
+    unit_base_id: 11,
     name: "Switching current",
     is_title: false,
     is_numeric: true,
@@ -219,7 +219,7 @@ const attributeSet = [
   {
     id: 10,
     parent_id: null,
-    unit_id: 14,
+    unit_base_id: 14,
     name: "Raster",
     is_title: false,
     is_numeric: true,
@@ -227,7 +227,7 @@ const attributeSet = [
   {
     id: 14,
     parent_id: null,
-    unit_id: 18,
+    unit_base_id: 18,
     name: "Frequency",
     is_title: false,
     is_numeric: true,
@@ -235,7 +235,7 @@ const attributeSet = [
   {
     id: 16,
     parent_id: null,
-    unit_id: 18,
+    unit_base_id: 18,
     name: "max. Frequency",
     is_title: false,
     is_numeric: true,
@@ -243,7 +243,7 @@ const attributeSet = [
   {
     id: 15,
     parent_id: null,
-    unit_id: 18,
+    unit_base_id: 18,
     name: "min. Frequency",
     is_title: false,
     is_numeric: true,
@@ -251,7 +251,7 @@ const attributeSet = [
   {
     id: 22,
     parent_id: null,
-    unit_id: 22,
+    unit_base_id: 22,
     name: "Capacity",
     is_title: false,
     is_numeric: true,
@@ -259,15 +259,15 @@ const attributeSet = [
   {
     id: 24,
     parent_id: null,
-    unit_id: 27,
+    unit_base_id: 27,
     name: "Operating Temperature",
     is_title: false,
-    is_numeric: false,
+    is_numeric: true,
   },
   {
     id: 26,
     parent_id: null,
-    unit_id: null,
+    unit_base_id: null,
     name: "Housing",
     is_title: false,
     is_numeric: false,
@@ -275,7 +275,7 @@ const attributeSet = [
   {
     id: 27,
     parent_id: null,
-    unit_id: null,
+    unit_base_id: null,
     name: "Number of pins",
     is_title: false,
     is_numeric: true,
@@ -283,7 +283,7 @@ const attributeSet = [
   {
     id: 25,
     parent_id: null,
-    unit_id: null,
+    unit_base_id: null,
     name: "Connectivity",
     is_title: true,
     is_numeric: null,
@@ -291,7 +291,7 @@ const attributeSet = [
   {
     id: 23,
     parent_id: null,
-    unit_id: null,
+    unit_base_id: null,
     name: "General",
     is_title: true,
     is_numeric: null,

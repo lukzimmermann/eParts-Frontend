@@ -33,7 +33,7 @@ export interface Attribute {
   parent_id: number | null;
   is_numeric: boolean | null;
   is_title: boolean;
-  unit_id: number;
+  unit_base_id: number;
   name: string;
 }
 

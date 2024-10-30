@@ -138,7 +138,7 @@ function SpecificationItem({
   const getAttributeNameEditor = () => {
     const handleAttributeNameChanged = (e) => {
       setSelectedAttributeName(e.value);
-      setSelectedAttributeUnit(unitSet.find((unit) => unit.id === e.value.unit_id));
+      setSelectedAttributeUnit(unitSet.find((unit) => unit.id === e.value.unit_base_id));
     };
 
     return (
@@ -170,12 +170,11 @@ function SpecificationItem({
       if (selectedAttributeName) {
         if (selectedAttributeName.is_numeric && !selectedAttributeName.is_title) {
           return getAttributeNumericValueEditor();
-        }
-        if (!selectedAttributeName.is_numeric && !selectedAttributeName.is_title) {
+        } else if (!selectedAttributeName.is_numeric && !selectedAttributeName.is_title) {
           return getAttributeTextValueEditor();
         }
-        if (selectedAttributeName.is_title) return getEditOptions();
-      } else return;
+      }
+      return getEditOptions();
     }
   };
 
@@ -202,10 +201,10 @@ function SpecificationItem({
           inputStyle={{ width: "5rem", textAlign: "right" }}
           onChange={(e) => setNumericValue(e.value)}
         />
-        {selectedAttributeName.unit_id ? (
+        {selectedAttributeName.unit_base_id ? (
           <Dropdown
             value={selectedAttributeUnit}
-            options={unitSet.filter((e) => selectedAttributeName.unit_id === e.parent_id)}
+            options={unitSet.filter((e) => selectedAttributeName.unit_base_id === e.parent_id)}
             optionLabel="name"
             onChange={(e) => setSelectedAttributeUnit(e.value)}
           />

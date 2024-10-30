@@ -53,7 +53,7 @@ function ProductSpecification({ title, dataSet, attributeSet, unitSet }: Props) 
     if (isContextSource) contextMenuRef.current.hide(e);
     else overlayPanelRef.current.toggle(e);
 
-    const existNewAttribute = data.find((item) => item.name === "New Attribute");
+    const existNewAttribute = data.find((item) => item.id === NEW_ITEM_ID);
 
     if (!existNewAttribute) {
       const newProductAttribute: ProductAttribute = {
