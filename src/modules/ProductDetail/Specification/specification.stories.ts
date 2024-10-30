@@ -31,7 +31,7 @@ const dataSet = [
     is_title: true,
     is_numeric: null,
     name: "General",
-    numeric_value: null,
+    numeric_value: 2,
     text_value: null,
     unit_id: -1,
     unit_base_id: -1,

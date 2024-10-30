@@ -25,7 +25,7 @@ function ProductSpecification({ title, dataSet, attributeSet, unitSet }: Props) 
   const contextMenuRef = useRef<ContextMenu>(null);
   const overlayPanelRef = useRef(null);
 
-  const menuModel = [
+  const contextMenuModel = [
     {
       label: "Add new attribute",
       icon: "pi pi-fw pi-plus",
@@ -44,10 +44,6 @@ function ProductSpecification({ title, dataSet, attributeSet, unitSet }: Props) 
       command: () => deleteAttribute(),
     },
   ];
-
-  const deleteAttribute = () => {
-    setData(data.filter((e) => !(e.name === selectedAttribute.name)));
-  };
 
   const addAttribute = (e, isContextSource: boolean) => {
     if (isContextSource) contextMenuRef.current.hide(e);
@@ -74,6 +70,10 @@ function ProductSpecification({ title, dataSet, attributeSet, unitSet }: Props) 
       setSelectedAttribute(newProductAttribute);
       setEditAttribute(newProductAttribute);
     }
+  };
+
+  const deleteAttribute = () => {
+    setData(data.filter((e) => !(e.name === selectedAttribute.name)));
   };
 
   const handleRowReorder = (dropAttribute: ProductAttribute, isUpper: boolean) => {
@@ -135,7 +135,7 @@ function ProductSpecification({ title, dataSet, attributeSet, unitSet }: Props) 
         </OverlayPanel>
       </div>
       <div className="h-px bg-[var(--text-color-secondary)] mt-2 mb-1" />
-      <ContextMenu model={menuModel} ref={contextMenuRef} onHide={() => setSelectedAttribute(null)} />
+      <ContextMenu model={contextMenuModel} ref={contextMenuRef} onHide={() => setSelectedAttribute(null)} />
       <div>
         {data.map((attribute) => (
           <SpecificationItem

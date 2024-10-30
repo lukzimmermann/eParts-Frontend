@@ -1,7 +1,5 @@
-import useClickOutside from "@/hooks/useClickOutside";
 import { Attribute, ProductAttribute, Unit } from "@/interfaces/product";
 import { motion } from "framer-motion";
-import { article } from "framer-motion/client";
 import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
 import { InputNumber } from "primereact/inputnumber";
@@ -136,10 +134,32 @@ function SpecificationItem({
   };
 
   const getAttributeNameEditor = () => {
+    interface DropdownItems {
+      label: string;
+      items: Attribute[];
+    }
+
     const handleAttributeNameChanged = (e) => {
       setSelectedAttributeName(e.value);
       setSelectedAttributeUnit(unitSet.find((unit) => unit.id === e.value.unit_base_id));
     };
+
+    const possibleOptions = selectedAttributeName
+      ? attributeSet.filter((a) =>
+          a.name === selectedAttributeName.name ? a.name : !attributes.some((b) => a.name === b.name)
+        )
+      : attributeSet.filter((a) => !attributes.some((b) => a.name === b.name));
+
+    const options = [
+      {
+        label: "Attributes",
+        items: possibleOptions.filter((e) => e.is_title === false),
+      },
+      {
+        label: "Titels",
+        items: possibleOptions.filter((e) => e.is_title === true),
+      },
+    ] as DropdownItems[];
 
     return (
       <Dropdown
@@ -147,14 +167,10 @@ function SpecificationItem({
         placeholder="Select a attribute name"
         filter
         value={selectedAttributeName ? selectedAttributeName : ""}
-        options={
-          selectedAttributeName
-            ? attributeSet.filter((a) =>
-                a.name === selectedAttributeName.name ? a.name : !attributes.some((b) => a.name === b.name)
-              )
-            : attributeSet.filter((a) => !attributes.some((b) => a.name === b.name))
-        }
+        options={options}
         optionLabel="name"
+        optionGroupLabel="label"
+        optionGroupChildren="items"
         onChange={(e) => {
           handleAttributeNameChanged(e);
         }}
@@ -179,6 +195,7 @@ function SpecificationItem({
   };
 
   const getAttributeValueDisplay = () => {
+    if (selectedAttributeName.is_title) return null;
     return (
       <>
         {attribute.numeric_value ? (
@@ -186,7 +203,6 @@ function SpecificationItem({
         ) : (
           <label>{attribute.text_value}</label>
         )}
-        {isEdit ? getEditOptions() : null}
       </>
     );
   };
@@ -223,6 +239,19 @@ function SpecificationItem({
     );
   };
 
+  const getIndicatorLine = (isIndicatorActive, isUpperIndicator = false) => {
+    const opacity = isUpperIndicator ? "opacity-0" : "opacity-100";
+    return (
+      <div
+        className={
+          isIndicatorActive
+            ? "h-0.5 bg-[var(--primary-color)] opacity-100 "
+            : `h-px bg-[var(--surface-d)] ${opacity} -mt-px`
+        }
+      />
+    );
+  };
+
   return (
     <motion.div
       ref={mainContainerRef}
@@ -235,24 +264,12 @@ function SpecificationItem({
       onDrag={() => onDrag(attribute)}
       draggable={isEdit ? false : true}
     >
-      <div
-        className={
-          upperIndicatorActive
-            ? "h-0.5 bg-[var(--primary-color)] opacity-100 -mt-0.5"
-            : "h-px bg-[var(--surface-d)] opacity-0 -mt-px"
-        }
-      />
+      {getIndicatorLine(upperIndicatorActive, true)}
       <div className="flex justify-between hover:bg-[var(--surface-hover)] transition-all py-2 px-2 text-[var(--text-color)] cursor-pointer">
         {getAttributeName()}
         {getAttributeValue()}
       </div>
-      <div
-        className={
-          lowerIndicatorActive
-            ? "h-0.5 bg-[var(--primary-color)] opacity-100 -mt-0.5"
-            : "h-px bg-[var(--surface-d)] -mt-px"
-        }
-      />
+      {getIndicatorLine(lowerIndicatorActive)}
     </motion.div>
   );
 }
