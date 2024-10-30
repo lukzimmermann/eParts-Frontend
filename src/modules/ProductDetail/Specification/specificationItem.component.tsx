@@ -46,8 +46,8 @@ function SpecificationItem({
     unitSet.find((e) => e.name === attribute.unit_name)
   );
   const mainContainerRef = useRef(null);
-  // useClickOutside(mainContainerRef, () => onEditCancel());
 
+  // Context Menu
   const getEditOptions = () => {
     return (
       <div className="-m-1">
@@ -69,29 +69,21 @@ function SpecificationItem({
     const newData: ProductAttribute = {
       id: selectedAttributeName.id,
       parent_id: selectedAttributeName.parent_id,
-      isTitle: false,
+      is_title: attributeSet.find((e) => e.name === selectedAttributeName.name).is_title,
+      is_numeric: false,
       name: selectedAttributeName.name,
       numeric_value: numericValue ? numericValue : null,
       text_value: textValue ? textValue : null,
-      unit_id: selectedAttributeUnit.id,
-      unit_base_id: selectedAttributeUnit.parent_id,
-      unit_name: selectedAttributeUnit.name,
+      unit_id: selectedAttributeUnit ? selectedAttributeUnit.id : null,
+      unit_base_id: selectedAttributeUnit ? selectedAttributeUnit.parent_id : null,
+      unit_name: selectedAttributeUnit ? selectedAttributeUnit.name : null,
       position: attribute.position,
     };
 
     onEditComplete(attribute, newData);
   };
 
-  const isUpperIndicator = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const y = e.clientY - rect.top;
-    if (y > (rect.bottom - rect.top) / 2) {
-      return false;
-    } else {
-      return true;
-    }
-  };
-
+  // Handle Drag&Drop
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     clearIndicator();
@@ -116,11 +108,22 @@ function SpecificationItem({
     onContextMenuSelectionChange(attribute);
   };
 
+  const isUpperIndicator = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const y = e.clientY - rect.top;
+    if (y > (rect.bottom - rect.top) / 2) {
+      return false;
+    } else {
+      return true;
+    }
+  };
+
   const clearIndicator = () => {
     setUpperIndicatorActive(false);
     setLowerIndicatorActive(false);
   };
 
+  // UI Elements
   const getAttributeName = () => {
     if (!isEdit) return getAttributeNameDisplay();
     else return getAttributeNameEditor();
@@ -128,23 +131,32 @@ function SpecificationItem({
 
   const getAttributeNameDisplay = () => {
     return (
-      <label className={attribute.isTitle ? "mt-4 text-[var(--text-color-secondary)]" : ""}>{attribute.name}</label>
+      <label className={attribute.is_title ? "mt-4 text-[var(--text-color-secondary)]" : ""}>{attribute.name}</label>
     );
   };
 
   const getAttributeNameEditor = () => {
+    const handleAttributeNameChanged = (e) => {
+      setSelectedAttributeName(e.value);
+      setSelectedAttributeUnit(unitSet.find((unit) => unit.id === e.value.unit_id));
+    };
+
     return (
       <Dropdown
         className="-ml-2"
         placeholder="Select a attribute name"
-        value={selectedAttributeName}
-        options={attributeSet.filter((a) =>
-          a.name === selectedAttributeName.name ? a.name : !attributes.some((b) => a.name === b.name)
-        )}
+        filter
+        value={selectedAttributeName ? selectedAttributeName : ""}
+        options={
+          selectedAttributeName
+            ? attributeSet.filter((a) =>
+                a.name === selectedAttributeName.name ? a.name : !attributes.some((b) => a.name === b.name)
+              )
+            : attributeSet.filter((a) => !attributes.some((b) => a.name === b.name))
+        }
         optionLabel="name"
         onChange={(e) => {
-          setSelectedAttributeName(e.value);
-          setSelectedAttributeUnit(unitSet.find((unit) => unit.id === e.value.unit_id));
+          handleAttributeNameChanged(e);
         }}
       />
     );
@@ -154,11 +166,16 @@ function SpecificationItem({
     if (!isEdit) {
       return getAttributeValueDisplay();
     } else {
-      if (attribute.numeric_value && !attribute.isTitle) {
-        return getAttributeNumericValueEditor();
-      } else {
-        return getAttributeTextValueEditor();
-      }
+      console.log(numericValue, textValue);
+      if (selectedAttributeName) {
+        if (selectedAttributeName.is_numeric && !selectedAttributeName.is_title) {
+          return getAttributeNumericValueEditor();
+        }
+        if (!selectedAttributeName.is_numeric && !selectedAttributeName.is_title) {
+          return getAttributeTextValueEditor();
+        }
+        if (selectedAttributeName.is_title) return getEditOptions();
+      } else return;
     }
   };
 
@@ -166,7 +183,7 @@ function SpecificationItem({
     return (
       <>
         {attribute.numeric_value ? (
-          <label>{`${attribute.numeric_value} ${attribute.unit_name}`}</label>
+          <label>{`${attribute.numeric_value} ${attribute.unit_id ? attribute.unit_name : ""}`}</label>
         ) : (
           <label>{attribute.text_value}</label>
         )}
@@ -185,12 +202,14 @@ function SpecificationItem({
           inputStyle={{ width: "5rem", textAlign: "right" }}
           onChange={(e) => setNumericValue(e.value)}
         />
-        <Dropdown
-          value={selectedAttributeUnit}
-          options={unitSet.filter((e) => selectedAttributeName.unit_id === e.parent_id)}
-          optionLabel="name"
-          onChange={(e) => setSelectedAttributeUnit(e.value)}
-        />
+        {selectedAttributeName.unit_id ? (
+          <Dropdown
+            value={selectedAttributeUnit}
+            options={unitSet.filter((e) => selectedAttributeName.unit_id === e.parent_id)}
+            optionLabel="name"
+            onChange={(e) => setSelectedAttributeUnit(e.value)}
+          />
+        ) : null}
         {isEdit ? getEditOptions() : null}
       </div>
     );

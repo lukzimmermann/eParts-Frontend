@@ -1,13 +1,11 @@
-import { useEffect, useRef, useState } from "react";
-import { Dropdown } from "primereact/dropdown";
-import { InputNumber } from "primereact/inputnumber";
+import { useRef, useState } from "react";
 import { ContextMenu } from "primereact/contextmenu";
 import { Button } from "primereact/button";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { Attribute, ProductAttribute, Unit } from "@/interfaces/product";
-import { InputText } from "primereact/inputtext";
 import SpecificationItem from "./specificationItem.component";
-import { motion } from "framer-motion";
+
+const NEW_ITEM_ID = -1;
 
 type Props = {
   title: string;
@@ -20,8 +18,6 @@ function ProductSpecification({ title, dataSet, attributeSet, unitSet }: Props) 
   const [data, setData] = useState<ProductAttribute[]>(
     dataSet.sort((a, b) => a.position - b.position).map((e, index) => ({ ...e, position: index }))
   );
-  const [attributes] = useState<Attribute[]>(attributeSet);
-  const [units] = useState<Unit[]>(unitSet);
   const [dragAttribute, setDragAttribute] = useState<ProductAttribute>(null);
   const [selectedAttribute, setSelectedAttribute] = useState<Attribute | null>(null);
   const [editAttribute, setEditAttribute] = useState<Attribute | null>(null);
@@ -61,10 +57,11 @@ function ProductSpecification({ title, dataSet, attributeSet, unitSet }: Props) 
 
     if (!existNewAttribute) {
       const newProductAttribute: ProductAttribute = {
-        id: -1,
-        isTitle: false,
+        id: NEW_ITEM_ID,
+        is_title: false,
+        is_numeric: false,
         parent_id: null,
-        name: "New Attribute",
+        name: null,
         numeric_value: null,
         text_value: null,
         unit_base_id: null,
@@ -74,6 +71,8 @@ function ProductSpecification({ title, dataSet, attributeSet, unitSet }: Props) 
       };
 
       setData((prevData: ProductAttribute[]) => [...prevData, newProductAttribute]);
+      setSelectedAttribute(newProductAttribute);
+      setEditAttribute(newProductAttribute);
     }
   };
 
@@ -98,8 +97,6 @@ function ProductSpecification({ title, dataSet, attributeSet, unitSet }: Props) 
   };
 
   const handleEditComplete = (oldData, newData) => {
-    console.log(oldData, newData);
-
     setData(
       data.map((e) => {
         if (e.name === oldData.name) {
@@ -109,6 +106,11 @@ function ProductSpecification({ title, dataSet, attributeSet, unitSet }: Props) 
       })
     );
 
+    setEditAttribute(null);
+  };
+
+  const handleEditCancel = () => {
+    setData(data.filter((e) => e.id !== NEW_ITEM_ID));
     setEditAttribute(null);
   };
 
@@ -148,7 +150,7 @@ function ProductSpecification({ title, dataSet, attributeSet, unitSet }: Props) 
             onRowReorder={(attribute, isUpper) => handleRowReorder(attribute, isUpper)}
             onDrag={(e) => setDragAttribute(e)}
             onEditComplete={(oldData, newData) => handleEditComplete(oldData, newData)}
-            onEditCancel={() => setEditAttribute(null)}
+            onEditCancel={() => handleEditCancel()}
           />
         ))}
       </div>
