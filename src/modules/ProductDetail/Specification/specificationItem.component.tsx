@@ -242,13 +242,16 @@ function SpecificationItem({
   const getIndicatorLine = (isIndicatorActive, isUpperIndicator = false) => {
     const opacity = isUpperIndicator ? "opacity-0" : "opacity-100";
     return (
-      <div
-        className={
-          isIndicatorActive
-            ? "h-0.5 bg-[var(--primary-color)] opacity-100 "
-            : `h-px bg-[var(--surface-d)] ${opacity} -mt-px`
-        }
-      />
+      <>
+        {!isIndicatorActive ? <div className="h-0.5 -mt-0.5" /> : null}
+        <div
+          className={
+            isIndicatorActive
+              ? "h-0.5 bg-[var(--primary-color)] opacity-100 -mt-0.5"
+              : `h-px bg-[var(--surface-d)] ${opacity} -mt-px`
+          }
+        />
+      </>
     );
   };
 
