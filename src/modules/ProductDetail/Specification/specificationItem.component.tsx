@@ -1,12 +1,17 @@
+import useClickOutsidee from "@/hooks/useClickOutside";
 import { Attribute, ProductAttribute, Unit } from "@/interfaces/product";
 import { motion } from "framer-motion";
 import { Button } from "primereact/button";
-import { useState } from "react";
+import { Dropdown } from "primereact/dropdown";
+import { InputNumber } from "primereact/inputnumber";
+import { InputText } from "primereact/inputtext";
+import { useRef, useState } from "react";
 
 type Props = {
-  attributeData: ProductAttribute;
+  attribute: ProductAttribute;
   attributeSet: Attribute[];
   unitSet: Unit[];
+  isEdit: boolean;
   onContextMenu: (e) => void;
   onContextMenuSelectionChange: (e: ProductAttribute) => void;
   onRowReorder: (
@@ -14,26 +19,38 @@ type Props = {
     isOnUpper: boolean
   ) => void;
   onDrag: (productAttribute: ProductAttribute) => void;
+  onEditCancel: () => void;
 };
 
-function SpecificationItem({
-  attributeData,
-  attributeSet,
-  unitSet,
-  onContextMenu,
-  onContextMenuSelectionChange,
-  onRowReorder,
-  onDrag,
-}: Props) {
-  const [attribute, setAttribute] = useState<ProductAttribute>(attributeData);
+function SpecificationItem(props: Props) {
+  const {
+    attribute,
+    attributeSet,
+    unitSet,
+    onContextMenu,
+    onContextMenuSelectionChange,
+    onRowReorder,
+    onDrag,
+    isEdit,
+    onEditCancel,
+  } = props;
+
   const [upperIndicatorActive, setUpperIndicatorActive] =
     useState<boolean>(false);
   const [lowerIndicatorActive, setLowerIndicatorActive] =
     useState<boolean>(false);
+  const [selectedAttributeName, setSelectedAttributeName] = useState<Attribute>(
+    attributeSet.find((e) => e.name === attribute.name)
+  );
+  const [selectedAttributeUnit, setSelectedAttributeUnit] = useState<Unit>(
+    unitSet.find((e) => e.name === attribute.unit_name)
+  );
+  const mainContainerRef = useRef(null);
+  // useClickOutsidee(mainContainerRef, () => onEditCancel());
 
   const getEditOptions = () => {
     return (
-      <div>
+      <div className="-m-1">
         <Button
           icon="pi pi-check"
           rounded
@@ -50,15 +67,13 @@ function SpecificationItem({
           text
           severity="secondary"
           size="large"
-          onClick={handleEditCancelClick}
+          onClick={onEditCancel}
         />
       </div>
     );
   };
 
   const handleEditSaveClick = () => {};
-
-  const handleEditCancelClick = () => {};
 
   const isUpperIndicator = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -99,17 +114,77 @@ function SpecificationItem({
     setLowerIndicatorActive(false);
   };
 
+  const getAttributeName = () => {
+    if (!isEdit) {
+      return (
+        <label
+          className={
+            attribute.isTitle ? "mt-4 text-[var(--text-color-secondary)]" : ""
+          }
+        >
+          {attribute.name}
+        </label>
+      );
+    }
+    return (
+      <Dropdown
+        className="-ml-2"
+        placeholder="Select a attribute name"
+        value={selectedAttributeName}
+        options={attributeSet}
+        optionLabel="name"
+        onChange={(e) => setSelectedAttributeName(e.value)}
+      />
+    );
+  };
+
+  const getAttributeValue = () => {
+    if (!isEdit) {
+      return (
+        <>
+          {attribute.numeric_value ? (
+            <label>{`${attribute.numeric_value} ${attribute.unit_name}`}</label>
+          ) : (
+            <label>{attribute.text_value}</label>
+          )}
+          {isEdit ? getEditOptions() : null}
+        </>
+      );
+    }
+    if (attribute.numeric_value) {
+      return (
+        <div className="flex gap-2">
+          <InputNumber
+            value={attribute.numeric_value}
+            inputStyle={{ width: "5rem", textAlign: "right" }}
+          />
+          <Dropdown
+            value={selectedAttributeUnit}
+            options={unitSet.filter(
+              (e) => selectedAttributeName.unit_id === e.parent_id
+            )}
+            optionLabel="name"
+            onChange={(e) => setSelectedAttributeUnit(e.value)}
+          />
+          {isEdit ? getEditOptions() : null}
+        </div>
+      );
+    } else {
+      return <InputText value={attribute.text_value} />;
+    }
+  };
+
   return (
     <motion.div
+      ref={mainContainerRef}
       layout
       layoutId={attribute.name}
-      transition={{ duration: 0.75 }}
-      draggable
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleOnDrop}
       onContextMenu={handleContextMenu}
       onDrag={() => onDrag(attribute)}
+      draggable
     >
       <div
         className={
@@ -119,12 +194,8 @@ function SpecificationItem({
         }
       />
       <div className="flex justify-between hover:bg-[var(--surface-hover)] transition-all py-2 px-2 text-[var(--text-color)] cursor-pointer">
-        <label>{attribute.name}</label>
-        {attribute.numeric_value ? (
-          <label>{`${attribute.numeric_value} ${attribute.unit_name}`}</label>
-        ) : (
-          <label>{attribute.text_value}</label>
-        )}
+        {getAttributeName()}
+        {getAttributeValue()}
       </div>
       <div
         className={
@@ -138,3 +209,6 @@ function SpecificationItem({
 }
 
 export default SpecificationItem;
+function useClickOutside(overlayRef: any, arg1: () => void) {
+  throw new Error("Function not implemented.");
+}

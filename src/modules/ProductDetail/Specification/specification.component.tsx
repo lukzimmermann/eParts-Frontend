@@ -1,6 +1,4 @@
-import { Column, ColumnEditorOptions } from "primereact/column";
-import { DataTable } from "primereact/datatable";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Dropdown } from "primereact/dropdown";
 import { InputNumber } from "primereact/inputnumber";
 import { ContextMenu } from "primereact/contextmenu";
@@ -8,6 +6,8 @@ import { Button } from "primereact/button";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { Attribute, ProductAttribute, Unit } from "@/interfaces/product";
 import { InputText } from "primereact/inputtext";
+import SpecificationItem from "./specificationItem.component";
+import { motion } from "framer-motion";
 
 type Props = {
   title: string;
@@ -23,20 +23,20 @@ function ProductSpecification({
   unitSet,
 }: Props) {
   const [data, setData] = useState<ProductAttribute[]>(
-    dataSet.sort((a, b) => a.position - b.position)
+    dataSet
+      .sort((a, b) => a.position - b.position)
+      .map((e, index) => ({ ...e, position: index }))
   );
   const [attributes] = useState<Attribute[]>(attributeSet);
   const [units] = useState<Unit[]>(unitSet);
+  const [dragAttribute, setDragAttribute] = useState<ProductAttribute>(null);
   const [selectedAttribute, setSelectedAttribute] = useState<Attribute | null>(
     null
   );
-  const [currentEditingAttribute, setCurrentEditingAttribute] =
-    useState<Attribute | null>();
-  const [editingRows, setEditingRows] = useState({});
+  const [editAttribute, setEditAttribute] = useState<Attribute | null>(null);
+
   const contextMenuRef = useRef<ContextMenu>(null);
   const overlayPanelRef = useRef(null);
-  const valueEditorRef = useRef(null);
-  const dataTableRef = useRef(null);
 
   const menuModel = [
     {
@@ -47,9 +47,8 @@ function ProductSpecification({
     {
       label: "Edit attribute",
       icon: "pi pi-fw pi-pencil",
-      command: () => {
-        setCurrentEditingAttribute(selectedAttribute);
-        setEditingRows({ ...{ [`${selectedAttribute.id}`]: true } });
+      command: (e) => {
+        console.log(setEditAttribute(selectedAttribute));
       },
     },
     {
@@ -58,94 +57,6 @@ function ProductSpecification({
       command: () => deleteAttribute(),
     },
   ];
-
-  const attributeNameEditor = (options: ColumnEditorOptions) => {
-    if (valueEditorRef.current)
-      valueEditorRef.current.editor = attributeValueEditor(options);
-    return (
-      <Dropdown
-        value={attributes.find((e) => options.rowData.name === e.name)}
-        //options={attributes.filter((a) => !data.some((b) => a.name === b.name))}
-        options={attributes}
-        optionLabel="name"
-        onChange={(e) => options.editorCallback!(e.value.name)}
-        onBlur={() => options.editorCallback!(options.value)}
-      />
-    );
-  };
-
-  const attributeValueEditor = (options: ColumnEditorOptions) => {
-    if (options.rowData.text_value) {
-      return (
-        <div className="flex gap-2 justify-end items-center">
-          <InputText
-            type="text"
-            value={options.rowData.text_value}
-            onChange={(e) => options.editorCallback(e.target.value)}
-            onKeyDown={(e) => e.stopPropagation()}
-          />
-          {getEditOptions()}
-        </div>
-      );
-    } else {
-      return (
-        <div className="flex gap-2 justify-end items-center">
-          <InputNumber
-            inputStyle={{ width: "6rem", textAlign: "right" }}
-            type="text"
-            maxFractionDigits={12}
-            value={options.rowData.numeric_value}
-            onChange={(e) => options.editorCallback!(e.value)}
-            onKeyDown={(e) => e.stopPropagation()}
-          />
-          <Dropdown
-            value={units.find((e) => options.rowData.unit_name === e.name)}
-            options={units.filter(
-              (e) => options.rowData.unit_base_id === e.parent_id
-            )}
-            optionLabel="name"
-            onChange={(e) => options.editorCallback!(e.value)}
-            onBlur={() => options.editorCallback!(options.value)}
-          />
-          {getEditOptions()}
-        </div>
-      );
-    }
-  };
-
-  const getEditOptions = () => {
-    return (
-      <div>
-        <Button
-          icon="pi pi-check"
-          rounded
-          outlined
-          text
-          severity="success"
-          size="large"
-          onClick={handleEditSaveClick}
-        />
-        <Button
-          icon="pi pi-times"
-          rounded
-          outlined
-          text
-          severity="secondary"
-          size="large"
-          onClick={handleEditCancelClick}
-        />
-      </div>
-    );
-  };
-
-  const handleEditSaveClick = () => {
-    console.log(currentEditingAttribute);
-    handleEditCancelClick();
-  };
-
-  const handleEditCancelClick = () => {
-    setEditingRows({});
-  };
 
   const deleteAttribute = () => {
     setData(data.filter((e) => !(e.name === selectedAttribute.name)));
@@ -162,6 +73,7 @@ function ProductSpecification({
     if (!existNewAttribute) {
       const newProductAttribute: ProductAttribute = {
         id: -1,
+        isTitle: false,
         parent_id: null,
         name: "New Attribute",
         numeric_value: null,
@@ -169,39 +81,39 @@ function ProductSpecification({
         unit_base_id: null,
         unit_id: null,
         unit_name: null,
-        position: 100,
+        position: 100000,
       };
 
       setData((prevData: ProductAttribute[]) => [
         ...prevData,
         newProductAttribute,
       ]);
-      setEditingRows({ ...{ [`-1`]: true } });
     }
   };
 
-  const createValueBody = (rowData) => {
-    if (rowData.text_value) {
-      return rowData.text_value;
-    } else {
-      return `${rowData.numeric_value} ${rowData.unit_name}`;
-    }
-  };
+  const handleRowReorder = (
+    dropAttribute: ProductAttribute,
+    isUpper: boolean
+  ) => {
+    if (dropAttribute.name === dragAttribute.name) return;
 
-  const handleOnReorderRow = (e) => {
-    e.value.forEach((item, index) => {
-      item.position = index;
+    const updatedData = data.map((item) => {
+      if (item.id === dragAttribute.id) {
+        return {
+          ...item,
+          position: isUpper
+            ? dropAttribute.position - 0.5
+            : dropAttribute.position + 0.5,
+        };
+      }
+      return item;
     });
-    setData(e.value.sort((a, b) => a.position - b.position));
-  };
 
-  const onRowEditComplete = (e: any) => {
-    console.log("EditComplete", e);
-  };
+    const reorderedData = updatedData
+      .sort((a, b) => a.position - b.position)
+      .map((item, index) => ({ ...item, position: index }));
 
-  const onRowEditChange = (e: any) => {
-    console.log(e);
-    setEditingRows(e.data);
+    setData(reorderedData);
   };
 
   return (
@@ -239,40 +151,30 @@ function ProductSpecification({
         ref={contextMenuRef}
         onHide={() => setSelectedAttribute(null)}
       />
-      <DataTable
-        ref={dataTableRef}
-        value={data}
-        showHeaders={false}
-        size="small"
-        editMode="row"
-        editingRows={editingRows}
-        dataKey="id"
-        onRowEditCancel={() => console.log("hello")}
-        onRowEditChange={onRowEditChange}
-        onRowEditComplete={onRowEditComplete}
-        reorderableRows
-        onContextMenu={(e) => contextMenuRef.current.show(e.originalEvent)}
-        contextMenuSelection={selectedAttribute}
-        onRowReorder={(e) => handleOnReorderRow(e)}
-        onContextMenuSelectionChange={(e) => setSelectedAttribute(e.value)}
-      >
-        <Column
-          key="name"
-          columnKey="name"
-          header="Name"
-          field="name"
-          editor={(options) => attributeNameEditor(options)}
-        />
-        <Column
-          ref={valueEditorRef}
-          key="numeric_value"
-          columnKey="numeric_value"
-          header="Value"
-          body={(rowData) => createValueBody(rowData)}
-          editor={(options) => attributeValueEditor(options)}
-          align="right"
-        />
-      </DataTable>
+      <div>
+        {data.map((attribute) => (
+          <SpecificationItem
+            key={attribute.name}
+            attribute={attribute}
+            attributeSet={attributeSet}
+            unitSet={unitSet}
+            isEdit={
+              editAttribute
+                ? attribute.name === editAttribute.name
+                  ? true
+                  : false
+                : false
+            }
+            onContextMenu={(e) => contextMenuRef.current.show(e)}
+            onContextMenuSelectionChange={(e) => setSelectedAttribute(e)}
+            onRowReorder={(attribute, isUpper) =>
+              handleRowReorder(attribute, isUpper)
+            }
+            onDrag={(e) => setDragAttribute(e)}
+            onEditCancel={() => setEditAttribute(null)}
+          />
+        ))}
+      </div>
     </div>
   );
 }

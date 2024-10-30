@@ -16,6 +16,7 @@ export interface Product {
 
 export interface ProductAttribute {
   id: number; // ID of the attribute (integer)
+  isTitle: boolean;
   parent_id: number | null; // Parent ID (integer or null)
   name: string; // Name of the attribute (string)
   numeric_value: number; // Numeric value of the attribute (number)

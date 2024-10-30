@@ -2,7 +2,7 @@ import { Meta, StoryObj } from "@storybook/react";
 import ProductSpecification from "./specification.component";
 
 const meta: Meta<typeof ProductSpecification> = {
-  title: "Product Specification",
+  title: "Product Specification2",
   component: ProductSpecification,
   tags: ["autodocs"],
 };
@@ -22,7 +22,19 @@ const dataSet = [
     unit_id: -1,
     unit_base_id: -1,
     unit_name: "NO_UNIT",
-    position: 2,
+    position: 0,
+  },
+  {
+    id: 23,
+    parent_id: null,
+    isTitle: true,
+    name: "General",
+    numeric_value: null,
+    text_value: null,
+    unit_id: -1,
+    unit_base_id: -1,
+    unit_name: "NO_UNIT",
+    position: 0,
   },
   {
     id: 1,
@@ -34,7 +46,7 @@ const dataSet = [
     unit_id: 1,
     unit_base_id: 1,
     unit_name: "Ohm",
-    position: 3,
+    position: 0,
   },
   {
     id: 2,
@@ -58,7 +70,7 @@ const dataSet = [
     unit_id: 9,
     unit_base_id: 9,
     unit_name: "W",
-    position: 1,
+    position: 0,
   },
 ];
 
